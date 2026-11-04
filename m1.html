@@ -10,6 +10,8 @@
 </head>
 <body>
 
+<div class="progress" id="progress" aria-hidden="true"></div>
+
 <nav class="nav">
   <div class="nav__inner">
     <a class="nav__brand" href="index.html">Our Radio <span>·</span> DIY guide</a>
@@ -41,6 +43,20 @@
       <span><b>Grader</b> Dr. Asem Alaa (A) · Sara Habo (B) · Mikhail Nady Daoud (C)</span>
     </div>
   </header>
+
+  <!-- ================= TOC ================= -->
+  <nav class="toc" id="toc" aria-label="On this page">
+    <a href="#overview" data-toc="overview">1 · What M1 does</a>
+    <a href="#parts" data-toc="parts">2 · Parts</a>
+    <a href="#predict" data-toc="predict">3 · Predict — Table 4</a>
+    <a href="#simulate" data-toc="simulate">4 · Simulate</a>
+    <a href="#build" data-toc="build">5 · Build</a>
+    <a href="#measure" data-toc="measure">6 · Measure</a>
+    <a href="#results" data-toc="results">7 · Results &amp; error</a>
+    <a href="#challenges" data-toc="challenges">8 · Challenges</a>
+    <a href="#checkpoint" data-toc="checkpoint">9 · Checkpoint 3</a>
+    <a href="#reading" data-toc="reading">10 · M1 in context</a>
+  </nav>
 
   <!-- ================= 1. OVERVIEW ================= -->
   <h2 id="overview">1 · What M1 does</h2>
@@ -827,5 +843,6 @@
 </footer>
 
 <script src="js/sim.js" defer></script>
+<script src="js/toc.js" defer></script>
 </body>
 </html>

@@ -83,6 +83,50 @@ a:hover { text-decoration: underline; }
   cursor: default;
 }
 
+/* ---------- table of contents (scrollspy) ---------- */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent), #34a37f);
+  z-index: 60;
+  transition: width 60ms linear;
+}
+.toc {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.25rem 0 0;
+  padding: 0.6rem 0.7rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scrollbar-width: none;
+}
+.toc::-webkit-scrollbar { display: none; }
+.toc a {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.toc a:hover { color: var(--accent); text-decoration: none; }
+.toc a.is-current {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: rgba(11, 110, 110, 0.3);
+  font-weight: 600;
+}
+.toc__home { color: var(--muted); }
+
 /* ---------- layout ---------- */
 .wrap {
   max-width: var(--maxw);
@@ -517,11 +561,21 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); }
   .hero { padding: 1.75rem 1.25rem; border-radius: 12px; }
   .nav__links { gap: 0.8rem; font-size: 0.88rem; }
   .pipeline__arrow { display: none; }
+  .toc { padding: 0.5rem 0.55rem; }
+  .toc a { font-size: 0.82rem; padding: 0.3rem 0.65rem; }
 }
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* ---------- smooth anchor offset (sticky nav) ---------- */
+h2[id] { scroll-margin-top: 70px; }
 
 /* ---------- print ---------- */
 @media print {
-  .nav, .footer { display: none; }
+  .nav, .footer, .toc, .progress { display: none; }
   body { background: #fff; font-size: 11pt; }
   .card, figure, table { box-shadow: none; }
   a { color: #000; }
