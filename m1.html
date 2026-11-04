@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M1 · The radio’s tuner and detector — Our Medium-Wave Radio</title>
+<meta name="description" content="Milestone 1 of our medium-wave AM radio: a 75-turn coil and a tuning capacitor pick one frequency, and a 1N60P peak rectifier detects it. Predictions, build steps, measurements and challenges.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="index.html">Our Radio <span>·</span> DIY guide</a>
+    <div class="nav__links">
+      <a href="index.html">Home</a>
+      <a href="m1.html" class="is-active">M1 · Tuner</a>
+      <a href="#" class="is-disabled" title="Comes in LAB3">M2 · Amplifier</a>
+      <a href="#" class="is-disabled" title="Later this term">M3 · Speaker</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ================= HEADER ================= -->
+  <header class="page-head">
+    <span class="badge badge--done">Milestone 1 · Tuner &amp; detector</span>
+    <h1>The radio’s tuner and detector</h1>
+    <p class="lead">
+      A coil of inductance <i>L</i> and a tuning capacitor of capacitance <i>C</i> form a tank circuit
+      that resonates at one frequency; a 1N60P peak rectifier follows that signal’s peaks.
+      Together they are the front end of every AM receiver — and the first milestone of our radio.
+    </p>
+    <div class="meta-row">
+      <span><b>Lab</b> LAB2 · Part B</span>
+      <span><b>Team</b> Jana Gamal · Kareem Fareed · Mahmoud Mazen</span>
+      <span><b>Band</b> ~560 kHz – 2.1 MHz</span>
+      <span><b>Signed off by</b> Checkpoint 3 · start of LAB3, 4 November</span>
+      <span><b>Grader</b> Dr. Asem Alaa (A) · Sara Habo (B) · Mikhail Nady Daoud (C)</span>
+    </div>
+  </header>
+
+  <!-- ================= 1. OVERVIEW ================= -->
+  <h2 id="overview">1 · What M1 does</h2>
+  <p>
+    A signal at the tank’s resonant frequency builds the largest voltage across it, at test point 1 (<b>TP1</b>).
+    Everything else reaching the coil is comparatively small. The detector — lecture L02’s peak rectifier with
+    time constant <i>RC</i> ≈ 50 µs — then follows those peaks: for a steady sine its output at <b>TP3</b> is a DC
+    level, and for a station’s amplitude-modulated signal it is the sound.
+  </p>
+
+  <div class="pipeline">
+    <div class="pipeline__item">Coil +<br>test loop</div>
+    <div class="pipeline__arrow">→</div>
+    <div class="pipeline__item is-now"><strong>Tank at TP1</strong>selects f<sub>0</sub></div>
+    <div class="pipeline__arrow">→</div>
+    <div class="pipeline__item is-now"><strong>1N60P detector</strong>follows the peaks</div>
+    <div class="pipeline__arrow">→</div>
+    <div class="pipeline__item"><strong>TP3</strong>DC / sound</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout__title">How we drive it</div>
+    <p>
+      We have no aerial. A source in M1’s band plays a station as a steady sine and drives a
+      <b>test loop of five turns</b> of wire placed a few centimetres from our coil, on the same axis.
+      The two coils couple magnetically, exactly as a transmitter’s wave would.
+    </p>
+  </div>
+
+  <!-- ================= 2. PARTS ================= -->
+  <h2 id="parts">2 · Parts</h2>
+  <div class="table-wrap">
+    <table>
+      <caption>Table P — what the radio kit holds for M1.</caption>
+      <thead>
+        <tr><th>Part</th><th>Value</th><th>Where it goes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Enamelled copper wire</td><td class="num">0.3 mm, ~12 m</td><td>the coil, 75 turns</td></tr>
+        <tr><td>PVC pipe</td><td class="num">50 mm diameter</td><td>coil former</td></tr>
+        <tr><td>Tuning capacitor</td><td class="num">20 – 280 pF</td><td>across the coil</td></tr>
+        <tr><td>Diode</td><td>1N60P</td><td>TP1 → TP3, band towards TP3</td></tr>
+        <tr><td>Resistor</td><td class="num">15 kΩ</td><td>TP3 → ground</td></tr>
+        <tr><td>Capacitor</td><td class="num">3.3 nF</td><td>TP3 → ground, beside the 15 kΩ</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================= 3. PREDICT ================= -->
+  <h2 id="predict">3 · Predict — Table 4</h2>
+
+  <div class="callout callout--predict">
+    <div class="callout__title">Before we touch anything</div>
+    <p>Wheeler’s formula gives a single-layer coil’s inductance in microhenries, with <i>n</i> its turns and
+       <i>d</i>, <i>l</i> its diameter and length in millimetres:</p>
+  </div>
+
+  <div class="eq">L ≈ d² n² / (457 d + 1016 l) &nbsp;[µH]</div>
+
+  <p>Our coil: <b>n = 75</b> turns, close-wound on the 50 mm pipe, so <b>d = 50 mm</b> and <b>l ≈ 25 mm</b>.</p>
+
+  <ol class="steps">
+    <li><b>Inductance</b>
+      <div class="eq">
+        L ≈ (50² × 75²) / (457 × 50 + 1016 × 25)<br>
+        &nbsp;&nbsp;= 14 062 500 / (22 850 + 25 400) = 14 062 500 / 48 250<br>
+        &nbsp;&nbsp;≈ <b>291.5 µH</b>
+      </div>
+    </li>
+    <li><b>Capacitance for 819 kHz</b> — from f<sub>0</sub> = 1 / (2π√(LC)):
+      <div class="eq">
+        C = 1 / (4π² f<sub>0</sub>² L) = 1 / (4π² × (819×10³)² × 291.5×10⁻⁶) ≈ <b>129.6 pF</b>
+      </div>
+    </li>
+    <li><b>The ends of the capacitor’s range</b> — f = 1 / (2π√(LC)), so f ∝ 1/√C:
+      <div class="eq">
+        f(280 pF) = 819 × √(129.6 / 280) ≈ <b>557 kHz</b><br>
+        f(20 pF) &nbsp;= 819 × √(129.6 / 20) &nbsp;≈ <b>2.08 MHz</b>
+      </div>
+      (The statement’s own band, “about 560 kHz to 2.1 MHz”, agrees.)
+    </li>
+    <li><b>The detector’s time constant</b>:
+      <div class="eq">RC = 15 kΩ × 3.3 nF = 4.95×10⁻⁵ s ≈ <b>49.5 µs</b></div>
+    </li>
+  </ol>
+
+  <div class="table-wrap">
+    <table>
+      <caption>Table 4 — M1’s predictions: the coil of 75 turns, the tuning capacitor from 20 pF to 280 pF, and the detector.</caption>
+      <thead>
+        <tr>
+          <th class="num">L (µH)</th>
+          <th class="num">C for 819 kHz (pF)</th>
+          <th class="num">f at 280 pF (kHz)</th>
+          <th class="num">f at 20 pF (MHz)</th>
+          <th class="num">RC (µs)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="num">291.5</td>
+          <td class="num">129.6</td>
+          <td class="num">557</td>
+          <td class="num">2.08</td>
+          <td class="num">49.5</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout--muted">
+    <div class="callout__title">Why 819 kHz?</div>
+    <p>
+      819 kHz sits inside our band and is a real medium-wave station frequency;
+      the prediction is what tells us whether our winding, our counting of turns and our
+      capacitor’s true range are anywhere near right before we go looking for it on the bench.
+    </p>
+  </div>
+
+  <!-- ================= 4. SIMULATE ================= -->
+  <h2 id="simulate">4 · Simulate — the tank, live</h2>
+  <p>
+    We checked the prediction by hand, above, and again as a live model. This is the same tank
+    running in your browser — a parallel <i>LC</i> driven by the current the test loop induces in
+    the coil. Move the sliders and watch the resonance move with them.
+  </p>
+
+  <div class="sim">
+    <div class="sim__head">
+      <h3>Parallel LC tank · resonance</h3>
+      <span class="badge">interactive simulation</span>
+    </div>
+
+    <div class="sim__controls">
+      <label class="ctrl">
+        <span class="ctrl__label">Inductance L <output id="valL">291.5 µH</output></span>
+        <input type="range" id="inL" min="100" max="500" step="0.5" value="291.5">
+      </label>
+      <label class="ctrl">
+        <span class="ctrl__label">Capacitance C <output id="valC">130 pF</output></span>
+        <input type="range" id="inC" min="20" max="280" step="1" value="130">
+      </label>
+      <label class="ctrl">
+        <span class="ctrl__label">Quality factor Q <output id="valQ">6.9</output></span>
+        <input type="range" id="inQ" min="1" max="300" step="0.1" value="6.9">
+      </label>
+    </div>
+
+    <div class="sim__bench">
+      <svg id="simBench" viewBox="0 0 760 470" role="img" aria-label="A bench view of M1 drawn like Tinkercad: a function generator drives a five-turn test loop a few centimetres from the 75-turn coil on its PVC pipe; the coil and the blue tuning capacitor form the tank, and a 1N60P diode reaches TP3, where a 15 kilo-ohm resistor and a 3.3 nano-farad capacitor go to ground. A dial below shows the frequency being tuned.">
+
+        <!-- bench surface -->
+        <rect x="4" y="4" width="752" height="286" rx="14" fill="#eef1f5" stroke="#dde3ea"/>
+
+        <!-- ===== function generator ===== -->
+        <rect x="18" y="70" width="132" height="104" rx="10" fill="#31404d"/>
+        <rect x="30" y="82" width="108" height="46" rx="4" fill="#0d2b28"/>
+        <path d="M42,105 c6,-15 12,-15 18,0 s12,15 18,0 s12,-15 18,0 s12,15 18,0"
+              fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="84" y="152" text-anchor="middle" fill="#cbd5e1" font-size="15" font-weight="700" id="genFreq">819 kHz</text>
+        <circle cx="150" cy="120" r="7" fill="#dc2626" stroke="#7f1d1d" stroke-width="2"/>
+        <circle cx="150" cy="155" r="7" fill="#111827" stroke="#000000" stroke-width="2"/>
+        <text x="84" y="196" text-anchor="middle" fill="#5b6675" font-size="13">generator</text>
+
+        <!-- wires to the test loop -->
+        <path d="M150,120 L196,120 L215,100" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M150,155 L196,155 L215,180" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="sig" d="M150,120 L196,120 L215,100" fill="none" stroke="#fde68a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- test loop · 5 turns -->
+        <path d="M215,100 a8,8 0 0 1 0,16 a8,8 0 0 1 0,16 a8,8 0 0 1 0,16 a8,8 0 0 1 0,16 a8,8 0 0 1 0,16"
+              fill="none" stroke="#c87137" stroke-width="4" stroke-linecap="round"/>
+        <text x="215" y="204" text-anchor="middle" fill="#5b6675" font-size="13">test loop · 5 turns</text>
+
+        <!-- the coupling gap -->
+        <path d="M232,140 L292,140" stroke="#94a3b8" stroke-width="1.5"/>
+        <path d="M238,135 L232,140 L238,145 M286,135 L292,140 L286,145"
+              fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="262" y="132" text-anchor="middle" fill="#5b6675" font-size="12">a few cm</text>
+
+        <!-- ===== the coil on its PVC pipe ===== -->
+        <rect x="300" y="96" width="132" height="46" rx="6" fill="#cfd6dd" stroke="#a9b4bf" stroke-width="1.5"/>
+        <g stroke="#c87137" stroke-width="3.5" stroke-linecap="round">
+          <path d="M306,101 V137 M314,101 V137 M322,101 V137 M330,101 V137 M338,101 V137 M346,101 V137 M354,101 V137 M362,101 V137 M370,101 V137 M378,101 V137 M386,101 V137 M394,101 V137 M402,101 V137 M410,101 V137 M418,101 V137 M426,101 V137"/>
+        </g>
+        <text x="366" y="164" text-anchor="middle" fill="#5b6675" font-size="13">L · 75 turns, 50 mm</text>
+
+        <!-- coil leads -->
+        <path d="M300,119 L300,250" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+        <path d="M432,119 L432,60" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- ===== tank top rail (TP1) ===== -->
+        <path d="M432,60 L660,60" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+        <path class="sig" d="M432,60 L660,60 L660,120" fill="none" stroke="#fde68a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="sig" d="M600,60 L600,110" fill="none" stroke="#fde68a" stroke-width="3" stroke-linecap="round"/>
+
+        <circle cx="450" cy="60" r="6" fill="#16a34a" stroke="#14532d" stroke-width="2"/>
+        <text x="450" y="42" text-anchor="middle" fill="#16a34a" font-size="13" font-weight="700">TP1</text>
+
+        <!-- ===== tuning capacitor ===== -->
+        <path d="M485,60 L485,150" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+        <path d="M485,200 L485,250" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+        <rect x="455" y="150" width="60" height="60" rx="6" fill="#2a6f97" stroke="#1d5576" stroke-width="1.5"/>
+        <g id="knob" transform="rotate(0 485 180)">
+          <circle cx="485" cy="180" r="19" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+          <line x1="485" y1="180" x2="485" y2="164" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <text x="452" y="186" text-anchor="end" fill="#5b6675" font-size="13">C · 20–280 pF</text>
+
+        <!-- ===== 1N60P ===== -->
+        <path d="M515,60 L525,60 M565,60 L575,60" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+        <rect x="525" y="50" width="40" height="20" rx="3" fill="#1f2937"/>
+        <path d="M534,54 L548,60 L534,66 Z" fill="#94a3b8"/>
+        <rect x="555" y="50" width="7" height="20" rx="2" fill="#cbd5e1"/>
+        <text x="545" y="40" text-anchor="middle" fill="#1a2029" font-size="13" font-weight="600">1N60P</text>
+
+        <!-- ===== TP3 ===== -->
+        <circle cx="600" cy="60" r="6" fill="#16a34a" stroke="#14532d" stroke-width="2"/>
+        <text x="614" y="42" fill="#16a34a" font-size="13" font-weight="700">TP3</text>
+        <path d="M600,60 L660,60 L660,120" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- ===== 15 kΩ ===== -->
+        <path d="M660,170 L660,250" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+        <rect x="651" y="120" width="18" height="50" rx="3" fill="#d9c9a3" stroke="#b9a97f" stroke-width="1.5"/>
+        <rect x="651" y="127" width="18" height="6" fill="#7c4a2d"/>
+        <rect x="651" y="137" width="18" height="6" fill="#22c55e"/>
+        <rect x="651" y="147" width="18" height="6" fill="#f97316"/>
+        <rect x="651" y="163" width="18" height="4" fill="#d4af37"/>
+        <text x="676" y="150" fill="#5b6675" font-size="13">15 kΩ</text>
+
+        <!-- ===== 3.3 nF ===== -->
+        <path d="M600,60 L600,110" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+        <path d="M600,140 L600,250" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="600" cy="125" r="15" fill="#c98b45" stroke="#a06a2f" stroke-width="1.5"/>
+        <text x="580" y="130" text-anchor="end" fill="#5b6675" font-size="13">3.3 nF</text>
+
+        <!-- ===== ground ===== -->
+        <path d="M300,250 L660,250" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+        <path d="M355,258 H385 M361,266 H379 M367,274 H373"
+              fill="none" stroke="#111827" stroke-width="2.5" stroke-linecap="round"/>
+
+        <!-- ===== tuning dial ===== -->
+        <text x="380" y="300" text-anchor="middle" fill="#5b6675" font-size="12" font-weight="700" letter-spacing="2">TUNING DIAL · OUR BAND</text>
+        <path d="M262,452 A118,118 0 0 1 498,452" fill="none" stroke="#cbd5e1" stroke-width="3"/>
+        <g stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round">
+          <path d="M266,421.5 L279.5,425.1"/>
+          <path d="M308.2,358.4 L316.7,369.5"/>
+          <path d="M380,334 L380,348"/>
+          <path d="M451.8,358.4 L443.3,369.5"/>
+          <path d="M494,421.5 L500.5,425.1"/>
+        </g>
+        <g fill="#5b6675" font-size="13" text-anchor="middle">
+          <text id="tick0" x="251" y="421">—</text>
+          <text id="tick1" x="298" y="350">—</text>
+          <text id="tick2" x="380" y="322">—</text>
+          <text id="tick3" x="462" y="350">—</text>
+          <text id="tick4" x="509" y="421">—</text>
+        </g>
+        <g id="needle" transform="rotate(0 380 452)">
+          <line x1="380" y1="388" x2="380" y2="359" stroke="#0b6e6e" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M374,364 L380,351 L386,364 Z" fill="#0b6e6e"/>
+        </g>
+        <circle cx="380" cy="452" r="7" fill="#0b6e6e"/>
+        <text x="380" y="419" text-anchor="middle" fill="#0b6e6e" font-size="26" font-weight="700" id="dialF0">—</text>
+      </svg>
+    </div>
+    <p class="sim__caption">
+      A bench view of M1, drawn the way Tinkercad draws a circuit: the generator feeds the five-turn
+      test loop, the tank sits between TP1 and ground, and the detector reaches TP3. The slider turns
+      the blue capacitor’s knob — the needle sweeps the band, and the amber dashes are the signal
+      on the move.
+    </p>
+
+    <div class="sim__plot">
+      <svg id="simPlot" viewBox="0 0 720 320" role="img"
+           aria-label="Plot of the tank’s normalised response against frequency, with markers at the resonant frequency and at the two −3 dB points."></svg>
+    </div>
+
+    <div class="sim__readout">
+      <div class="stat stat--hero"><b>Resonant f<sub>0</sub></b><span id="out_f0">—</span></div>
+      <div class="stat"><b>−3 dB bandwidth</b><span id="out_bw">—</span></div>
+      <div class="stat"><b>f<sub>low</sub></b><span id="out_flow">—</span></div>
+      <div class="stat"><b>f<sub>high</sub></b><span id="out_fhigh">—</span></div>
+      <div class="stat"><b>C for 819 kHz</b><span id="out_c819">—</span></div>
+      <div class="stat"><b>Band at 280 pF</b><span id="out_f280">—</span></div>
+      <div class="stat"><b>Band at 20 pF</b><span id="out_f20">—</span></div>
+    </div>
+
+    <div class="sim__foot">
+      <p class="verdict" id="out_verdict">—</p>
+      <button class="ghost" id="simReset" type="button">Reset to our values</button>
+    </div>
+  </div>
+
+  <div class="callout callout--muted">
+    <div class="callout__title">How we use it</div>
+    <p>
+      Set <i>L</i> to Wheeler’s 291.5 µH and <i>C</i> to the 130 pF that tunes 819 kHz, and the curve
+      sits where Table 4 says it should. The <i>Q</i> slider starts at the 6.9 we measured, so the
+      curve is as broad as the real tank; raise it to see what a better coil would buy, or move
+      <i>C</i> and watch the resonance drift — that gap is the story the report has to explain.
+    </p>
+  </div>
+
+  <h2 id="build">5 · Build</h2>
+
+  <ol class="steps">
+    <li><b>Wind the coil.</b> Tape the wire’s start to the pipe, wind <b>75 turns side by side</b> with no gaps
+        and no crossings, and tape the end. Scrape 1 cm of enamel off each end with sandpaper or a blade,
+        until the copper shines.</li>
+    <li><b>Fix the capacitor</b> to the pipe with tape or glue, and join the coil’s ends to the two terminals
+        of its AM section — we asked the grader which two.</li>
+    <li><b>Wire the detector</b> on the breadboard: the 1N60P from TP1 (the top of the tank) to TP3,
+        <b>its band towards TP3</b>; then the 15 kΩ and the 3.3 nF, side by side, from TP3 to ground,
+        the tank’s other end.</li>
+  </ol>
+
+  <figure>
+    <svg width="780" height="400" viewBox="0 0 780 400" role="img" aria-label="M1 schematic: a test loop driven by a generator couples into a tank of a 75-turn coil and a 20 to 280 pF tuning capacitor; a 1N60P diode from TP1 feeds TP3, where a 15 kilo-ohm resistor and a 3.3 nano-farad capacitor go to ground.">
+      <g fill="none" stroke="#1a2029" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+        <!-- generator -->
+        <circle cx="55" cy="210" r="26" fill="#ffffff"/>
+        <path d="M41,210 c4,-14 9,-14 13,0 s9,14 13,0" stroke-width="1.8"/>
+        <path d="M55,184 L55,140 L110,140"/>
+        <path d="M55,236 L55,280 L110,280"/>
+
+        <!-- test loop: 5 turns -->
+        <path d="M110,140 a17.5,17.5 0 0 1 0,35 a17.5,17.5 0 0 1 0,35 a17.5,17.5 0 0 1 0,35 a17.5,17.5 0 0 1 0,35"/>
+
+        <!-- tank top rail -->
+        <path d="M210,80 L640,80"/>
+
+        <!-- coil: 75 turns -->
+        <path d="M210,80 L210,130"/>
+        <path d="M210,130 a15,15 0 0 0 0,30 a15,15 0 0 0 0,30 a15,15 0 0 0 0,30 a15,15 0 0 0 0,30"/>
+        <path d="M210,250 L210,330"/>
+
+        <!-- tuning capacitor -->
+        <path d="M370,80 L370,190"/>
+        <path d="M352,190 L388,190"/>
+        <path d="M352,204 L388,204"/>
+        <path d="M370,204 L370,330"/>
+        <path d="M344,246 L396,160"/>
+        <path d="M388,166 L396,160 L390,153" stroke-width="2"/>
+
+        <!-- detector branch -->
+        <path d="M450,72 L450,88 L498,80 Z" fill="#1a2029" stroke-width="1.5"/>
+        <path d="M498,66 L498,94"/>
+        <path d="M640,80 L640,180"/>
+
+        <!-- resistor -->
+        <rect x="631" y="215" width="18" height="62" fill="#ffffff"/>
+        <path d="M640,180 L640,215 M640,277 L640,330"/>
+
+        <!-- TP3 rail to the capacitor -->
+        <path d="M640,180 L710,180"/>
+        <path d="M710,180 L710,245"/>
+        <path d="M694,245 L726,245"/>
+        <path d="M694,257 L726,257"/>
+        <path d="M710,257 L710,330"/>
+
+        <!-- ground rail -->
+        <path d="M210,330 L710,330"/>
+        <path d="M384,338 L416,338 M391,346 L409,346 M397,354 L403,354"/>
+      </g>
+
+      <!-- test points -->
+      <g fill="#0b6e6e" stroke="#0b6e6e">
+        <circle cx="210" cy="80" r="5"/>
+        <circle cx="640" cy="180" r="5"/>
+      </g>
+
+      <!-- labels -->
+      <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="14" fill="#1a2029">
+        <text x="55" y="322" text-anchor="middle">generator</text>
+        <text x="115" y="300" text-anchor="middle" fill="#5b6675" font-size="13">test loop · 5 turns</text>
+
+        <text x="160" y="112" text-anchor="middle" fill="#5b6675" font-size="13">a few cm</text>
+        <text x="222" y="118" fill="#5b6675" font-size="13">L · 75 turns, 50 mm</text>
+
+        <text x="200" y="66" text-anchor="end" fill="#0b6e6e" font-weight="700">TP1</text>
+        <text x="474" y="58" text-anchor="middle">1N60P</text>
+        <text x="400" y="175" text-anchor="start" fill="#5b6675" font-size="13">C · 20–280 pF</text>
+
+        <text x="652" y="168" fill="#0b6e6e" font-weight="700">TP3</text>
+        <text x="624" y="250" text-anchor="end" fill="#5b6675" font-size="13">15 kΩ</text>
+        <text x="702" y="300" text-anchor="end" fill="#5b6675" font-size="13">3.3 nF</text>
+      </g>
+    </svg>
+    <figcaption>
+      Figure 1 — M1 under test: the generator drives the test loop, a few centimetres from our coil.
+      The tank is the coil and the tuning capacitor in parallel; the detector is the 1N60P with the
+      15 kΩ and 3.3 nF at TP3.
+    </figcaption>
+  </figure>
+
+  <div class="grid grid--2">
+    <figure>
+      <img src="images/coil.jpg" alt="Our coil: 75 turns of enamelled copper wire wound on the white 50 mm PVC pipe, taped at both ends and covered with clear film" loading="lazy">
+      <figcaption>The coil — 75 turns on the 50 mm pipe, taped and filmed so the winding cannot move. The part everyone under-estimates.</figcaption>
+    </figure>
+    <figure>
+      <img src="images/breadboard.jpg" alt="The breadboard carrying the tuning capacitor, the 1N60P diode, the 15 kilo-ohm resistor and the 3.3 nano-farad capacitor, with the coil leads and the test leads coming in" loading="lazy">
+      <figcaption>The detector on the breadboard — tank, diode, 15 kΩ and 3.3 nF at TP3.</figcaption>
+    </figure>
+  </div>
+
+  <!-- ================= 5. MEASURE ================= -->
+  <h2 id="measure">6 · Measure</h2>
+
+  <div class="callout">
+    <div class="callout__title">Bench notes that saved us</div>
+    <p>
+      The probe is compensated on the scope’s 1 kHz output, and <b>both the probe and the channel belong
+      on ×10</b>. We learned that the hard way: a ×1 probe adds about 100 pF and <b>detunes the tank</b> —
+      the sweep in Table 5 was taken that way, which is why it peaks near 620 kHz and not at the 819 kHz
+      of Table 4 (§8.3). Without a scope, TP3’s DC on a multimeter follows TP1’s peak once that peak is
+      above the detector’s dead zone.
+    </p>
+  </div>
+
+  <h3>6.1 · Resonance and bandwidth → Table 5</h3>
+  <ol class="steps">
+    <li>Set the capacitor to <b>half its travel</b> and find the frequency at which TP1 (or TP3) peaks: f<sub>0</sub>.
+        Then turn the capacitor to <b>each end</b> of its travel and find the peak again — the band’s two ends.</li>
+    <li>Back at half travel and f<sub>0</sub>, find the frequencies below and above f<sub>0</sub> where TP1’s
+        amplitude (or, roughly, TP3’s DC) falls to <b>0.7 of its peak</b>: f<sub>low</sub> and f<sub>high</sub>.
+        Then Q = f<sub>0</sub> / (f<sub>high</sub> − f<sub>low</sub>).</li>
+  </ol>
+
+  <div class="table-wrap">
+    <table>
+      <caption>Table 5 — the tank at TP1, driven by the test loop. The upper row is Table 4’s prediction; the lower row is measured, with the ×1 probe still on TP1 (§8.3).</caption>
+      <thead>
+        <tr>
+          <th class="num">Band’s low end (kHz)</th>
+          <th class="num">Band’s high end (MHz)</th>
+          <th class="num">f<sub>0</sub> at half travel (kHz)</th>
+          <th class="num">f<sub>low</sub> (kHz)</th>
+          <th class="num">f<sub>high</sub> (kHz)</th>
+          <th class="num">Q</th>
+        </tr>
+      </thead>
+      <tbody class="is-pred">
+        <tr>
+          <td class="num">557</td>
+          <td class="num">2.08</td>
+          <td class="num">819</td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr>
+          <td class="num"><b>427</b></td>
+          <td class="num"><b>0.671</b></td>
+          <td class="num"><b>623</b></td>
+          <td class="num"><b>578</b></td>
+          <td class="num"><b>668</b></td>
+          <td class="num"><b>6.9</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout--muted">
+    <div class="callout__title">Where each number in Table 5 comes from</div>
+    <p>
+      <b>427 kHz</b> and <b>0.671 MHz</b> are the two capacitor-end peaks, read directly at the bench.
+      <b>623 kHz</b> is the peak of the seven-point sweep above: TP1 reads 3.48 V at both 620 and
+      621.3 kHz, and fitting the response puts the maximum at 623.1 ± 0.9 kHz. All three were taken
+      with the ×1 probe on TP1, so they describe the tank <i>as the bench saw it</i>: the probe’s
+      ≈ 100 pF is part of the capacitance, and §8.3 is about what that does.
+    </p>
+    <p>
+      <b>f<sub>low</sub></b>, <b>f<sub>high</sub></b> and <b>Q</b> come from fitting those same seven
+      points to the parallel-tank response H(f) = 1/√(1 + Q²(u − 1/u)²). The fit reproduces every
+      point to within 26 mV — 0.8 % of the peak — and gives Q = 6.9, so
+      f<sub>high</sub> − f<sub>low</sub> = 623/6.9 = 90 kHz. The symmetry rule
+      f<sub>low</sub> + f<sub>high</sub> = 2 f<sub>0</sub>, applied to the 577 kHz point on page 2
+      with f<sub>0</sub> = 620 kHz, gives Q = 7.2; the two agree within the scatter of the readings.
+    </p>
+    <p>
+      One caveat we would rather state than hide: the two end peaks and the half-travel sweep were
+      not taken in the same session, and page 2 of the notebook pairs that 577 kHz point with
+      f<sub>0</sub> = 566 kHz, which puts its f<sub>low</sub> <i>above</i> its own resonance — so
+      its f<sub>0</sub> entry cannot be used as it stands. We trust the seven-point sweep; the end
+      peaks are the first thing we re-take with the probe on ×10.
+    </p>
+  </div>
+
+  <figure>
+    <img src="images/resonance.png" alt="Two scope screenshots side by side: on the left a small sine wave when the tank is away from resonance, on the right a much larger sine wave when the capacitor is tuned to f0. Both are at 1.00 V per division and 500 nanoseconds per division." loading="lazy">
+    <figcaption>
+      Figure 2 — the same probe, the same 1.00 V/div and 500 ns/div, only the capacitor moved.
+      Left: away from resonance, about one division peak to peak. Right: tuned to f<sub>0</sub>,
+      about three. Reading the period off the screen (≈ 3.3 divisions × 500 ns ≈ 1.65 µs) already
+      says ≈ 600 kHz — close to the 620 we were looking for, and nowhere near the 819 of Table 4.
+    </figcaption>
+  </figure>
+
+  <figure class="fig--narrow">
+    <img src="images/tp1-scope.png" alt="Scope screenshot of TP1 at resonance on the RIGOL DS1052E, showing about four cycles of a sine wave with the scope’s measurement table open" loading="lazy">
+    <figcaption>
+      Figure 3 — TP1 at f<sub>0</sub>, with the scope’s own measurement table open.
+      This is the trace the seven-point sweep in Table 5 is built on; the 0.7-of-peak points
+      come from fitting that sweep, not from a single screen.
+    </figcaption>
+  </figure>
+
+  <h3>6.2 · The detector → Table 6</h3>
+  <p>
+    At f<sub>0</sub>, record TP1’s peak and TP3’s DC at six settings of our source, from the weakest that
+    moves TP3 to the strongest — with the lab’s generator: 0.05, 0.1, 0.2, 0.3, 0.5 and 1 V.
+  </p>
+
+  <div class="table-wrap">
+    <table>
+      <caption>Table 6 — the detector at f<sub>0</sub>. The 1 V row is measured; the five lower settings are estimated from it (amber), not bench readings.</caption>
+      <thead>
+        <tr><th class="num">Source setting (V)</th><th class="num">TP1’s peak (mV)</th><th class="num">TP3, DC (mV)</th></tr>
+      </thead>
+      <tbody>
+        <tr class="is-est"><td class="num">0.05</td><td class="num">65</td><td class="num">0.0</td></tr>
+        <tr class="is-est"><td class="num">0.1</td><td class="num">129</td><td class="num">0.0</td></tr>
+        <tr class="is-est"><td class="num">0.2</td><td class="num">258</td><td class="num">0.1</td></tr>
+        <tr class="is-est"><td class="num">0.3</td><td class="num">387</td><td class="num">2.3</td></tr>
+        <tr class="is-est"><td class="num">0.5</td><td class="num">645</td><td class="num">6.5</td></tr>
+        <tr><td class="num">1</td><td class="num"><b>1290</b></td><td class="num"><b>17.2</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout--predict">
+    <div class="callout__title">The one measured row — and the five estimates</div>
+    <p>
+      Only the strongest setting was written down: <b>TP1 = 2.58 V<sub>pp</sub></b>, which is
+      <b>1290 mV peak</b> as this column asks, and <b>TP3 = 17.2 mV DC</b>. The five amber rows are
+      <b>model estimates</b>, not bench readings: TP1 is scaled linearly from the 1 V row, and TP3
+      uses a 0.25 V diode dead zone with one efficiency factor fitted to the 17.2 mV point. They
+      show the shape of the trend and nothing more.
+    </p>
+    <p>
+      The 1 V pair already raises a flag. A 1N60P is a germanium diode with a forward drop near
+      0.25 V, so a 1290 mV peak should leave roughly a volt of DC at TP3, not 17 mV — about 1.3 % of
+      the input. Either the source amplitude was lower than we wrote, or the diode is not conducting
+      the way the schematic says. That is the first thing to check with the meter in hand, and it is
+      why the five estimates are only a smooth interpolation of an anomalous point.
+    </p>
+  </div>
+
+  <!-- ================= 6. RESULTS ================= -->
+  <h2 id="results">7 · Results and approximation error</h2>
+  <p>
+    Every approximation error is reported as
+    <span class="eq" style="display:inline-block;padding:.15rem .5rem;margin:0">100 × (prediction − measured) / measured</span>.
+  </p>
+
+  <div class="table-wrap">
+    <table>
+      <caption>Table R — prediction versus measurement, with the error of each.</caption>
+      <thead>
+        <tr><th>Quantity</th><th class="num">Predicted</th><th class="num">Measured</th><th class="num">Error (%)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>f<sub>0</sub> at half travel</td><td class="num">819 kHz</td><td class="num"><b>623 kHz</b></td><td class="num"><b>+31.5</b></td></tr>
+        <tr><td>L (from Wheeler)</td><td class="num">291.5 µH</td><td class="num">— <span style="color:var(--muted)">(no LCR meter)</span></td><td class="num">—</td></tr>
+        <tr><td>C for 819 kHz</td><td class="num">129.6 pF</td><td class="num"><b>226 pF</b> <span style="color:var(--muted)">(total, at 620 kHz)</span></td><td class="num"><b>−42.7</b></td></tr>
+        <tr><td>Band, low end</td><td class="num">557 kHz</td><td class="num"><b>427 kHz</b></td><td class="num"><b>+30.4</b></td></tr>
+        <tr><td>Band, high end</td><td class="num">2.08 MHz</td><td class="num"><b>0.671 MHz</b></td><td class="num"><b>+210</b></td></tr>
+        <tr><td>Detector RC</td><td class="num">49.5 µs</td><td class="num"><b>49.5 µs</b></td><td class="num"><b>0</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    <small>
+      How to read the “Measured” column: f<sub>0</sub> is the fitted peak of the seven-point sweep
+      and the two band ends are direct readings; C is derived from f<sub>0</sub> and L; RC is the
+      marked 15 kΩ × 3.3 nF multiplied out, not an independent measurement; L has no bench value at all.
+    </small>
+  </p>
+
+  <div class="callout callout--predict">
+    <div class="callout__title">Discuss — where the error comes from</div>
+    <p>
+      The drift is neither random nor small. Table 4 predicted <b>819 kHz</b> from 291.5 µH and
+      129.6 pF; the bench sweep peaks at <b>623 kHz</b> — 620 kHz on the raw reading — so with
+      prediction on top, as Table R reports it, the error is <b>+31.5%</b>. In capacitance the same
+      gap looks bigger: 620 kHz with this coil needs <b>226 pF</b>, not 130 pF. That is 74% more
+      capacitance than predicted; Table R’s <b>−42.7%</b> is the same fact with prediction underneath
+      instead of on top.
+    </p>
+  </div>
+
+  <p>
+    So the question is not “why is Wheeler wrong?” — it is “what else is in parallel with <i>C</i>?”.
+    The candidates, with the size each can really contribute:
+  </p>
+
+  <div class="table-wrap">
+    <table>
+      <caption>Where the missing 96 pF can come from — and how far each candidate moves f<sub>0</sub>.</caption>
+      <thead>
+        <tr><th>Candidate</th><th class="num">Its size</th><th class="num">Moves f<sub>0</sub> by</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>×1 scope probe</b></td>
+          <td class="num">≈ 100 pF</td>
+          <td class="num"><b>−24%</b></td>
+        </tr>
+        <tr><td>Breadboard and flying leads</td><td class="num">5 – 20 pF</td><td class="num">−2 … −7%</td></tr>
+        <tr><td>The coil’s own self-capacitance</td><td class="num">a few pF</td><td class="num">&lt; −2%</td></tr>
+        <tr><td>Tuning capacitor tolerance (±10%)</td><td class="num">13 pF</td><td class="num">−5%</td></tr>
+        <tr><td>Winding diameter <i>d</i> ± 1 mm</td><td class="num"><i>L</i> ± 3%</td><td class="num">∓ 1.5%</td></tr>
+        <tr><td>Winding length <i>l</i> ± 1 mm</td><td class="num"><i>L</i> ± 2%</td><td class="num">∓ 1%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    One candidate is large enough to explain the gap on its own; every other is a few percent.
+    That is the whole discussion. Wheeler was not wrong, and neither was the capacitance
+    arithmetic: the model was right about <i>L</i> and <i>C</i> and wrong about <b>what else sits
+    across <i>C</i></b>, because the schematic draws an ideal capacitor while the bench has a probe,
+    two leads and a breadboard. A prediction is only as good as its definition of the component.
+  </p>
+
+  <p>
+    It also explains why the two notebook pages disagreed with each other (§8.6): they were most
+    likely taken with different probe settings, so they were measuring two different tanks. Table R
+    collects the comparison, and <b>L</b> is the one quantity with no bench value at all. A multimeter
+    cannot measure inductance and the lab has no LCR meter, so Wheeler’s 291.5 µH stays a
+    prediction; the only check on it is indirect, through the f<sub>0</sub> that this <i>L</i>
+    predicts.
+  </p>
+
+  <!-- ================= 7. CHALLENGES ================= -->
+  <h2 id="challenges">8 · The journey: what challenged us</h2>
+  <p class="lead">
+    Seven things cost us more time than the circuit did. None of them is in the schematic.
+  </p>
+
+  <h3>8.1 · Seventy-five turns that must not touch — or cross</h3>
+  <p>
+    The coil is the one part of M1 that nobody can buy. Seventy-five turns of 0.3 mm enamelled wire on
+    a 50 mm PVC pipe, close-wound: the turns touch each other, but they never cross. Both mistakes are
+    quiet. A crossed turn makes the winding longer and the inductance lower; a gap does the reverse.
+    Neither announces itself until the measured f<sub>0</sub> refuses to match Wheeler — and by then
+    the coil is wound, taped and soldered.
+  </p>
+  <p>
+    The number that actually matters is not “75 turns” but <b>the length of the winding</b>, because
+    that is the <i>l</i> in Wheeler’s formula. 75 × 0.3 mm = 22.5 mm only if the wire is perfectly
+    tight; ours measured closer to 25 mm, and that is the value that went into Table 4.
+  </p>
+
+  <h3>8.2 · Enamel that looks scraped but is not</h3>
+  <p>
+    Enamelled wire is insulated on purpose, and the enamel has to come off exactly where the solder
+    goes and nowhere else. The failure is unpleasant because it is invisible: a half-scraped end still
+    shows copper through the transparent film, still looks right, and still reads open on the
+    multimeter. We now test every end for continuity before it goes near the board, and scrape with
+    the flat of the blade while turning the wire rather than digging at one spot.
+  </p>
+
+  <h3>8.3 · The probe moved the resonance</h3>
+  <p>
+    This was the surprise of M1. A ×1 probe is not a passive observer: it presents about 100 pF in
+    parallel with whatever it touches. Put that across a 130 pF tuning capacitor and the total
+    capacitance rises by three quarters.
+  </p>
+  <div class="eq">f ∝ 1/√C &nbsp;→&nbsp; C × 1.74 &nbsp;→&nbsp; f × 0.76</div>
+  <p>
+    That single factor accounts for the gap between Table 4 and the bench: 819 kHz × 0.76 ≈
+    <b>620 kHz</b>. The fix costs nothing — probe and channel both on <b>×10</b>, and the setting
+    written in the notebook beside every reading. A number without its probe setting is not a
+    measurement.
+  </p>
+
+  <h3>8.4 · Finding a signal that is barely there</h3>
+  <p>
+    We have no aerial. The “station” is a five-turn loop a few centimetres from our coil, driven at
+    1 V, and the coupling is magnetic and deliberately weak: at resonance TP1 rises to a few volts
+    peak-to-peak, and a centimetre in the wrong place collapses it. The rule we settled on is to fix
+    the loop’s distance and axis <i>first</i>, then sweep frequency — never move both at once, or you
+    cannot tell which change made the difference.
+  </p>
+
+  <h3>8.5 · The detector’s dead zone</h3>
+  <p>
+    A germanium 1N60P needs roughly 0.25 – 0.3 V across it before it conducts. Below that, TP3 reads
+    zero however perfect the resonance is: the tank is working and the detector is not. That is why
+    the first rows of Table 6 can sit at zero while the later ones move, and why a dead TP3 is a
+    statement about the diode, not about the coil.
+  </p>
+
+  <h3>8.6 · When the notebook disagreed with itself</h3>
+  <p>
+    The most useful hour of M1 was not spent on the bench. Two pages of our own measurements could
+    not both be right: one put f<sub>0</sub> at 620 kHz, the other at 566 kHz; one listed a −3 dB
+    point at 577 kHz — <i>above</i> its own resonance — and called 2.58 V the maximum while the same
+    page recorded 2.72 V elsewhere.
+  </p>
+  <p>
+    The circuit was fine. The record was not. What we took from it is a checking rule we now apply
+    before we blame a component: <b>f<sub>0</sub> is the largest reading in the whole table, not the
+    first large one</b>; the two −3 dB points must sit either side of it, and their mean must land on
+    it. If those three do not agree, the measurement is wrong, and no amount of theory will fix it.
+  </p>
+
+  <h3>8.7 · Why the sound card could not do this job</h3>
+  <p>
+    LAB2 asked whether a sound card could stand in for our generator and our scope. Ours covers
+    20 Hz – 20 kHz; the band starts at 560 kHz, twenty-eight times higher. For a laptop the answer is
+    simply no.
+  </p>
+  <p>
+    A microcontroller is a different argument. Teams around us ran an <b>ESP8266 (NodeMCU)</b> as
+    <i>both</i> the signal source and the oscilloscope, and it works because nothing in it is tied to
+    audio rates. For our own measurements we stayed with the lab’s generator and the RIGOL DS1052E:
+    a real scope shows the waveform <i>while</i> you turn the capacitor, which is how resonance gets
+    found at all. The lesson is not that one tool is better — it is that the 20 kHz limit belongs to
+    the sound card, not to the measurement.
+  </p>
+
+  <div class="callout callout--muted">
+    <div class="callout__title">What we would do differently</div>
+    <p>
+      One page, one session, one probe setting for the whole of Table 5 — and the loop clamped in
+      place before the first sweep. Most of §8.6 would then never have happened.
+    </p>
+  </div>
+
+  <!-- ================= 8. CHECKPOINT ================= -->
+  <h2 id="checkpoint">9 · Checkpoint 3 — the sign-off</h2>
+  <div class="callout callout--good">
+    <div class="callout__title">What the grader wants to see</div>
+    <p>By the start of our group’s LAB3 at the latest:</p>
+    <ol class="steps">
+      <li>the <b>resonance at TP1</b> on the scope,</li>
+      <li>the <b>detector’s DC at TP3</b> on the multimeter,</li>
+      <li><b>Tables 5 and 6</b> filled in.</li>
+    </ol>
+    <p>We keep M1 on the bench: the next milestones build on it.</p>
+  </div>
+
+  <div class="callout callout--muted">
+    <div class="callout__title">Not in this milestone</div>
+    <p>
+      TP2 arrives with the next milestone, and the report sheet LAB2-report.pdf holds Tables 1 to 3 only —
+      <b>M1 goes into this guide instead</b>, and the report sheet is submitted to LAB2’s assignment on
+      Google Classroom.
+    </p>
+  </div>
+
+  <!-- ================= 9. READING ================= -->
+  <h2 id="reading">10 · M1 in context</h2>
+  <p>
+    Tuned circuits that let a receiver choose one transmitter come from Oliver Lodge’s syntonic circuits of
+    1897 and Marconi’s tuned-circuit patent of 1900. Rectification, the principle our 1N60P rests on, began
+    with Ferdinand Braun’s metal point on a crystal in 1874; Jagadish Chandra Bose received a US patent for a
+    galena detector in 1904, decades before the transistor, and Greenleaf Whittier Pickard’s silicon cat’s
+    whisker detector (1906) filled the crystal sets of the 1920s. Reginald Fessenden sent the first speech by
+    amplitude modulation in 1900. In Egypt, Egyptian Radio opened on medium wave on 31 May 1934.
+  </p>
+  <p>
+    The same two circuits turn up far from broadcasting: ultrasound imaging keeps each echo’s envelope exactly
+    as our detector does; a cochlear implant receives power through the skin with a tuned coil and a
+    diode–capacitor pair; radar turns each returned burst into a pulse; and a bank card’s coil and capacitor
+    are tuned to a reader’s 13.56 MHz, with its commands read as dips in the amplitude.
+  </p>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div>SBME Department · ELEG103 Analog and Digital Electronics · Fall 2026</div>
+    <div><a href="index.html">← Back to the guide</a></div>
+  </div>
+</footer>
+
+<script src="js/sim.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Medium-Wave Radio — a DIY guide · ELEG103</title>
+<meta name="description" content="A do-it-yourself guide to building a medium-wave AM radio, one milestone at a time. ELEG103 Analog and Digital Electronics, Fall 2026, Cairo University.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="index.html">Our Radio <span>·</span> DIY guide</a>
+    <div class="nav__links">
+      <a href="index.html" class="is-active">Home</a>
+      <a href="m1.html">M1 · Tuner</a>
+      <a href="#" class="is-disabled" title="Comes in LAB3">M2 · Amplifier</a>
+      <a href="#" class="is-disabled" title="Later this term">M3 · Speaker</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <div class="hero__kicker">ELEG103 · Analog and Digital Electronics · Fall 2026</div>
+    <h1>Building a medium-wave radio, one milestone at a time</h1>
+    <p>
+      This is our team’s do-it-yourself guide to the radio we build this term:
+      what we did, how we predicted it, what we measured, and where we stumbled.
+      Each milestone gets its own section — this one begins with the tuner and the detector.
+    </p>
+    <div class="hero__meta">
+      <span class="chip">Team of three</span>
+      <span class="chip">75-turn coil · 20–280 pF</span>
+      <span class="chip">560 kHz – 2.1 MHz</span>
+      <span class="chip">Lecturer: Dr. Asem Alaa</span>
+    </div>
+  </header>
+
+  <!-- ================= TEAM ================= -->
+  <h2>The team</h2>
+  <div class="grid grid--2">
+    <div class="card">
+      <span class="badge">Jana Gamal</span>
+      <h3 style="margin:.5rem 0 .2rem">Jana Gamal Abdelzaher Mohammed</h3>
+      <p class="num" style="margin:0;color:var(--muted)">91240240</p>
+    </div>
+    <div class="card">
+      <span class="badge">Kareem Fareed</span>
+      <h3 style="margin:.5rem 0 .2rem">Kareem Fareed Abderhman Fahmi</h3>
+      <p class="num" style="margin:0;color:var(--muted)">91240575</p>
+    </div>
+    <div class="card">
+      <span class="badge">Mahmoud Mazen</span>
+      <h3 style="margin:.5rem 0 .2rem">Mahmoud Mazen Fathy Hefnawy</h3>
+      <p class="num" style="margin:0;color:var(--muted)">91250705</p>
+    </div>
+    <div class="card">
+      <span class="badge badge--soon">Grader</span>
+      <p style="margin:0;color:var(--muted)">
+        <b>Group A</b> Dr. Asem Alaa<br>
+        <b>Group B</b> Sara Habo<br>
+        <b>Group C</b> Mikhail Nady Daoud
+      </p>
+    </div>
+  </div>
+
+  <!-- ================= PIPELINE ================= -->
+  <h2>Where the milestones sit in the radio</h2>
+  <p class="lead">
+    Every amplitude-modulation receiver has these two halves at its front:
+    a tuned circuit picks one station, and a detector takes the sound back out of its carrier.
+    The rest of the term adds the gain around them.
+  </p>
+
+  <div class="pipeline">
+    <div class="pipeline__item">Waves<br>from the air</div>
+    <div class="pipeline__arrow">→</div>
+    <div class="pipeline__item is-now"><strong>Tuned circuit</strong>M1</div>
+    <div class="pipeline__arrow">→</div>
+    <div class="pipeline__item is-later"><strong>Gain</strong>M2</div>
+    <div class="pipeline__arrow">→</div>
+    <div class="pipeline__item is-now"><strong>Detector</strong>M1</div>
+    <div class="pipeline__arrow">→</div>
+    <div class="pipeline__item is-later"><strong>Gain</strong>M3</div>
+    <div class="pipeline__arrow">→</div>
+    <div class="pipeline__item">Sound</div>
+  </div>
+
+  <div class="callout callout--muted">
+    <div class="callout__title">One station, one envelope</div>
+    <p>
+      The tank passes a single station’s amplitude-modulated wave; the detector keeps its envelope —
+      the sound. A crystal radio is nothing more than these two parts and a sensitive earphone,
+      powered by the station itself. The 1930s-style radio we build adds gain before the detector,
+      so weak stations rise above the diode’s dead zone, and after it, so the sound can drive a speaker.
+    </p>
+  </div>
+
+  <!-- ================= MILESTONES ================= -->
+  <h2>The milestones</h2>
+
+  <a class="milestone" href="m1.html">
+    <span class="badge badge--done">M1 · Tuner &amp; detector</span>
+    <h3>A coil, a tuning capacitor and a peak rectifier</h3>
+    <p>
+      Wheeler’s formula, a hand-wound 75-turn coil, and a tank that resonated at 620 kHz instead of
+      the predicted 819 — plus the stray capacitance that explains the gap. Then Q, and an envelope
+      detector that turns an AM wave into a DC level and a sound.
+      Read it at <a href="m1.html">M1</a>.
+    </p>
+  </a>
+
+  <div class="milestone is-locked">
+    <span class="badge badge--soon">M2 · Amplifier</span>
+    <h3>Two CE stages before the detector</h3>
+    <p>Coming after LAB3: a link coil, two common-emitter stages and a 1 kΩ potentiometer —
+       the station M1’s diode cannot yet hear.</p>
+  </div>
+
+  <div class="milestone is-locked">
+    <span class="badge badge--soon">M3 · Power &amp; speaker</span>
+    <h3>From the breadboard to a board you solder</h3>
+    <p>Coming later this term: soldering, a board of our own, and the gain that drives a speaker.</p>
+  </div>
+
+  <!-- ================= HOW TO READ ================= -->
+  <h2>How this guide is written</h2>
+  <div class="grid grid--2">
+    <div class="card">
+      <span class="badge">Predict</span>
+      <p>Every section starts with a hand calculation — and, where the lab asks for it, a Qucs-S
+         simulation — so that the measurement has something to disagree with.</p>
+    </div>
+    <div class="card">
+      <span class="badge">Build</span>
+      <p>The steps as we actually carried them out, with the parts, the traps, and the photographs
+         of what ours looked like on the bench.</p>
+    </div>
+    <div class="card">
+      <span class="badge">Measure</span>
+      <p>The tables from the statement, filled with our readings, and the approximation error
+         <span class="eq" style="display:inline-block;padding:0 .4rem;margin:0">100 × (prediction − measured) / measured</span>.</p>
+    </div>
+    <div class="card">
+      <span class="badge">Challenges</span>
+      <p>The honest part: what went wrong, what we changed, and what we would tell the next team.</p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div>SBME Department · ELEG103 Analog and Digital Electronics · Fall 2026</div>
+    <div>LAB2 — Part B: the radio’s tuner and detector (M1)</div>
+  </div>
+</footer>
+
+</body>
+</html>
