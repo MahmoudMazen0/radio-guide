@@ -18,6 +18,7 @@ radio-guide/
 ├── css/style.css   All styling (design tokens at the top of the file)
 ├── js/sim.js       The interactive tank simulator (§4) — plain JS, no dependencies
 ├── favicon.svg     The tab icon
+├── .nojekyll       Tells GitHub Pages to serve the files as they are
 ├── images/         Photographs and scope screenshots (see images/README.md)
 └── README.md       This file
 ```
@@ -49,28 +50,25 @@ figure captions rely on them.
 
 ## Publishing on GitHub Pages
 
-1. **Create the repository**
-   - GitHub → **New repository** → name it `radio-guide` → **Public** → Create.
-   - Do *not* add a README when creating it (this folder already has one).
+The site is live at **https://mahmoudmazen0.github.io/radio-guide/** — the repository is
+**https://github.com/MahmoudMazen0/radio-guide**. These are the steps that put it there, kept
+here so the next milestone can follow them.
+
+1. **The repository** — already created, public, at `MahmoudMazen0/radio-guide`.
 
 2. **Push this folder**
    ```powershell
-   cd D:\study\2-Electronics\Lab\Milestones
-   git init radio-guide
-   cd radio-guide
+   cd D:\study\2-Electronics\Lab\Milestones\radio-guide
    git add .
    git commit -m "M1: the radio's tuner and detector"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/radio-guide.git
-   git push -u origin main
+   git push
    ```
 
-3. **Turn on Pages**
-   - Repo → **Settings** → **Pages** → *Build and deployment* → Source: **Deploy from a branch** →
-     Branch: **main** / **/(root)** → **Save**.
+3. **Pages** — already on: **Settings** → **Pages** → *Build and deployment* → Source:
+   **Deploy from a branch** → Branch: **main** / **/(root)**. GitHub rebuilds on every push.
 
 4. **Open the site** — after a minute or two:
-   `https://<your-username>.github.io/radio-guide/`
+   **https://mahmoudmazen0.github.io/radio-guide/**
 
    Put that link in your submission / show it to your M1 grader.
 
