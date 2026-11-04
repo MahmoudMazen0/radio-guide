@@ -3,12 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>Our Medium-Wave Radio — a DIY guide · ELEG103</title>
 <meta name="description" content="A do-it-yourself guide to building a medium-wave AM radio, one milestone at a time. ELEG103 Analog and Digital Electronics, Fall 2026, Cairo University.">
+<meta property="og:title" content="Our Medium-Wave Radio — a DIY guide · ELEG103">
+<meta property="og:description" content="A 75-turn coil, a tuning capacitor and a 1N60P detector — predictions, build steps, measurements and challenges.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mahmoudmazen0.github.io/radio-guide/">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preload" as="style" href="css/style.css">
 </head>
 <body>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
 
 <nav class="nav">
   <div class="nav__inner">
@@ -18,6 +26,7 @@
       <a href="m1.html">M1 · Tuner</a>
       <a href="#" class="is-disabled" title="Comes in LAB3">M2 · Amplifier</a>
       <a href="#" class="is-disabled" title="Later this term">M3 · Speaker</a>
+      <button type="button" class="theme-toggle" onclick="window.__toggleTheme&&window.__toggleTheme()" aria-label="Toggle theme">◐</button>
     </div>
   </div>
 </nav>
@@ -157,9 +166,10 @@
 <footer class="footer">
   <div class="footer__inner">
     <div>SBME Department · ELEG103 Analog and Digital Electronics · Fall 2026</div>
-    <div>LAB2 — Part B: the radio’s tuner and detector (M1)</div>
+    <div>LAB2 — Part B: the radio's tuner and detector (M1)</div>
   </div>
 </footer>
 
+<script src="js/theme.js" defer></script>
 </body>
 </html>

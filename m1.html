@@ -3,10 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>M1 · The radio’s tuner and detector — Our Medium-Wave Radio</title>
+<meta name="color-scheme" content="light dark">
+<title>M1 · The radio's tuner and detector — Our Medium-Wave Radio</title>
 <meta name="description" content="Milestone 1 of our medium-wave AM radio: a 75-turn coil and a tuning capacitor pick one frequency, and a 1N60P peak rectifier detects it. Predictions, build steps, measurements and challenges.">
+<meta property="og:title" content="M1 · The radio's tuner and detector — Our Medium-Wave Radio">
+<meta property="og:description" content="Wheeler, a hand-wound 75-turn coil, f0 620 kHz instead of 819, Q 6.9, and the stray capacitance that explains it.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mahmoudmazen0.github.io/radio-guide/m1.html">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preload" as="style" href="css/style.css">
 </head>
 <body>
 
@@ -20,6 +26,7 @@
       <a href="m1.html" class="is-active">M1 · Tuner</a>
       <a href="#" class="is-disabled" title="Comes in LAB3">M2 · Amplifier</a>
       <a href="#" class="is-disabled" title="Later this term">M3 · Speaker</a>
+      <button type="button" class="theme-toggle" onclick="window.__toggleTheme&&window.__toggleTheme()" aria-label="Toggle theme">◐</button>
     </div>
   </div>
 </nav>
@@ -1047,5 +1054,6 @@
 
 <script src="js/sim.js" defer></script>
 <script src="js/toc.js" defer></script>
+<script src="js/theme.js" defer></script>
 </body>
 </html>
