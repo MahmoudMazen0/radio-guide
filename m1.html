@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f141b" media="(prefers-color-scheme: dark)">
 <title>M1 · The radio's tuner and detector — Our Medium-Wave Radio</title>
 <meta name="description" content="Milestone 1 of our medium-wave AM radio: a 75-turn coil and a tuning capacitor pick one frequency, and a 1N60P peak rectifier detects it. Predictions, build steps, measurements and challenges.">
 <meta property="og:title" content="M1 · The radio's tuner and detector — Our Medium-Wave Radio">
@@ -24,8 +26,8 @@
     <div class="nav__links">
       <a href="index.html">Home</a>
       <a href="m1.html" class="is-active">M1 · Tuner</a>
-      <a href="#" class="is-disabled" title="Comes in LAB3">M2 · Amplifier</a>
-      <a href="#" class="is-disabled" title="Later this term">M3 · Speaker</a>
+      <a href="#" class="is-disabled" aria-disabled="true" title="Comes in LAB3">M2 · Amplifier</a>
+      <a href="#" class="is-disabled" aria-disabled="true" title="Later this term">M3 · Speaker</a>
       <button type="button" class="theme-toggle" onclick="window.__toggleTheme&&window.__toggleTheme()" aria-label="Toggle theme">◐</button>
     </div>
   </div>
@@ -592,11 +594,11 @@
 
   <div class="grid grid--2">
     <figure>
-      <img src="images/coil.jpg" alt="Our coil: 75 turns of enamelled copper wire wound on the white 50 mm PVC pipe, taped at both ends and covered with clear film" loading="lazy">
+      <img src="images/coil.jpg" width="1200" height="900" alt="Our coil: 75 turns of enamelled copper wire wound on the white 50 mm PVC pipe, taped at both ends and covered with clear film" loading="lazy">
       <figcaption>The coil — 75 turns on the 50 mm pipe, taped and filmed so the winding cannot move. The part everyone under-estimates.</figcaption>
     </figure>
     <figure>
-      <img src="images/breadboard.jpg" alt="The breadboard carrying the tuning capacitor, the 1N60P diode, the 15 kilo-ohm resistor and the 3.3 nano-farad capacitor, with the coil leads and the test leads coming in" loading="lazy">
+      <img src="images/breadboard.jpg" width="1280" height="720" alt="The breadboard carrying the tuning capacitor, the 1N60P diode, the 15 kilo-ohm resistor and the 3.3 nano-farad capacitor, with the coil leads and the test leads coming in" loading="lazy">
       <figcaption>The detector on the breadboard — tank, diode, 15 kΩ and 3.3 nF at TP3.</figcaption>
     </figure>
   </div>
@@ -758,7 +760,7 @@
   </figure>
 
   <figure>
-    <img src="images/resonance.png" alt="Two scope screenshots side by side: on the left a small sine wave when the tank is away from resonance, on the right a much larger sine wave when the capacitor is tuned to f0. Both are at 1.00 V per division and 500 nanoseconds per division." loading="lazy">
+    <img src="images/resonance.png" width="1568" height="836" alt="Two scope screenshots side by side: on the left a small sine wave when the tank is away from resonance, on the right a much larger sine wave when the capacitor is tuned to f0. Both are at 1.00 V per division and 500 nanoseconds per division." loading="lazy">
     <figcaption>
       Figure 3 — the same probe, the same 1.00 V/div and 500 ns/div, only the capacitor moved.
       Left: away from resonance, about one division peak to peak. Right: tuned to f<sub>0</sub>,
@@ -768,7 +770,7 @@
   </figure>
 
   <figure class="fig--narrow">
-    <img src="images/tp1-scope.png" alt="Scope screenshot of TP1 at resonance on the RIGOL DS1052E, showing about four cycles of a sine wave with the scope’s measurement table open" loading="lazy">
+    <img src="images/tp1-scope.png" width="792" height="750" alt="Scope screenshot of TP1 at resonance on the RIGOL DS1052E, showing about four cycles of a sine wave with the scope’s measurement table open" loading="lazy">
     <figcaption>
       Figure 4 — TP1 at f<sub>0</sub>, with the scope’s own measurement table open.
       This is the trace the seven-point sweep in Table 5 is built on; the 0.7-of-peak points

@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f141b" media="(prefers-color-scheme: dark)">
 <title>Our Medium-Wave Radio — a DIY guide · ELEG103</title>
 <meta name="description" content="A do-it-yourself guide to building a medium-wave AM radio, one milestone at a time. ELEG103 Analog and Digital Electronics, Fall 2026, Cairo University.">
 <meta property="og:title" content="Our Medium-Wave Radio — a DIY guide · ELEG103">
@@ -24,8 +26,8 @@
     <div class="nav__links">
       <a href="index.html" class="is-active">Home</a>
       <a href="m1.html">M1 · Tuner</a>
-      <a href="#" class="is-disabled" title="Comes in LAB3">M2 · Amplifier</a>
-      <a href="#" class="is-disabled" title="Later this term">M3 · Speaker</a>
+      <a href="#" class="is-disabled" aria-disabled="true" title="Comes in LAB3">M2 · Amplifier</a>
+      <a href="#" class="is-disabled" aria-disabled="true" title="Later this term">M3 · Speaker</a>
       <button type="button" class="theme-toggle" onclick="window.__toggleTheme&&window.__toggleTheme()" aria-label="Toggle theme">◐</button>
     </div>
   </div>
@@ -120,7 +122,7 @@
       Wheeler’s formula, a hand-wound 75-turn coil, and a tank that resonated at 620 kHz instead of
       the predicted 819 — plus the stray capacitance that explains the gap. Then Q, and an envelope
       detector that turns an AM wave into a DC level and a sound.
-      Read it at <a href="m1.html">M1</a>.
+      Read it at <strong>M1</strong>.
     </p>
   </a>
 
