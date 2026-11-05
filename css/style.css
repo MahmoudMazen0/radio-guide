@@ -614,52 +614,40 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); }
    Every figure and the simulator draw with hardcoded light-theme hex values as
    SVG presentation attributes. A CSS declaration beats a presentation
    attribute, so these selectors repaint the artwork without touching markup.
+   Scoped to .wrap svg so it covers the article figures AND the tank widget —
+   the widget sits in a plain div, not a <figure>, so `figure svg` missed it.
    Deliberately NOT restyled: #fff / #ffffff — white sits inside coloured chips
    (checklist numbers, hollow data-point markers) and must stay white. */
-[data-theme="dark"] figure svg [fill="#1a2029"],
-[data-theme="dark"] figure svg [fill="#111827"] { fill: #e6ebf2; }
-[data-theme="dark"] figure svg [fill="#5b6675"] { fill: #9aa7b8; }
-[data-theme="dark"] figure svg [fill="#7c4a2d"] { fill: #c8a07a; }
+[data-theme="dark"] .wrap svg [fill="#1a2029"],
+[data-theme="dark"] .wrap svg [fill="#111827"] { fill: #e6ebf2; }
+[data-theme="dark"] .wrap svg [fill="#5b6675"] { fill: #9aa7b8; }
+[data-theme="dark"] .wrap svg [fill="#7c4a2d"] { fill: #c8a07a; }
 
-[data-theme="dark"] figure svg [stroke="#1a2029"] { stroke: #e6ebf2; }
-[data-theme="dark"] figure svg [stroke="#111827"],
-[data-theme="dark"] figure svg [stroke="#000000"] { stroke: #cbd5e1; }
+[data-theme="dark"] .wrap svg [stroke="#1a2029"] { stroke: #e6ebf2; }
+[data-theme="dark"] .wrap svg [stroke="#111827"],
+[data-theme="dark"] .wrap svg [stroke="#000000"] { stroke: #cbd5e1; }
 
-[data-theme="dark"] figure svg [fill="#fbfcfd"] { fill: #1f2935; }
-[data-theme="dark"] figure svg [fill="#eef1f5"] { fill: #26313e; }
-[data-theme="dark"] figure svg [stroke="#dde3ea"] { stroke: #2a3644; }
-[data-theme="dark"] figure svg [stroke="#eef1f5"] { stroke: #26313e; }
-[data-theme="dark"] figure svg [stroke="#cbd5e1"] { stroke: #3a4756; }
+[data-theme="dark"] .wrap svg [fill="#fbfcfd"] { fill: #1f2935; }
+[data-theme="dark"] .wrap svg [fill="#eef1f5"] { fill: #26313e; }
+[data-theme="dark"] .wrap svg [stroke="#dde3ea"] { stroke: #2a3644; }
+[data-theme="dark"] .wrap svg [stroke="#eef1f5"] { stroke: #26313e; }
+[data-theme="dark"] .wrap svg [stroke="#cbd5e1"] { stroke: #3a4756; }
 
-[data-theme="dark"] figure svg [fill="#0b6e6e"] { fill: #3dbfb8; }
-[data-theme="dark"] figure svg [stroke="#0b6e6e"] { stroke: #3dbfb8; }
-[data-theme="dark"] figure svg [fill="#b45309"] { fill: #f0a04b; }
-[data-theme="dark"] figure svg [stroke="#b45309"] { stroke: #f0a04b; }
-[data-theme="dark"] figure svg [fill="#16794a"] { fill: #4ade80; }
+[data-theme="dark"] .wrap svg [fill="#0b6e6e"] { fill: #3dbfb8; }
+[data-theme="dark"] .wrap svg [stroke="#0b6e6e"] { stroke: #3dbfb8; }
+[data-theme="dark"] .wrap svg [fill="#b45309"] { fill: #f0a04b; }
+[data-theme="dark"] .wrap svg [stroke="#b45309"] { stroke: #f0a04b; }
+[data-theme="dark"] .wrap svg [fill="#16794a"] { fill: #4ade80; }
 
-[data-theme="dark"] figure svg [fill="#fdf3e7"] { fill: #3d2b17; }
-[data-theme="dark"] figure svg [stroke="#f3d8b5"] { stroke: #5c4426; }
-[data-theme="dark"] figure svg [fill="#0d2b28"] { fill: #12433c; }
-[data-theme="dark"] figure svg [fill="#cfd6dd"] { fill: #3a4756; }
-[data-theme="dark"] figure svg [fill="#1f2937"] { fill: #475569; }
-[data-theme="dark"] figure svg [fill="#31404d"] { fill: #4a5b6d; }
+[data-theme="dark"] .wrap svg [fill="#fdf3e7"] { fill: #3d2b17; }
+[data-theme="dark"] .wrap svg [stroke="#f3d8b5"] { stroke: #5c4426; }
+[data-theme="dark"] .wrap svg [fill="#0d2b28"] { fill: #12433c; }
+[data-theme="dark"] .wrap svg [fill="#cfd6dd"] { fill: #3a4756; }
+[data-theme="dark"] .wrap svg [fill="#1f2937"] { fill: #475569; }
+[data-theme="dark"] .wrap svg [fill="#31404d"] { fill: #4a5b6d; }
 
-/* the interactive tank plot + bench view use the same palette (set by sim.js) */
-[data-theme="dark"] .sim__plot svg [fill="#fbfcfd"],
-[data-theme="dark"] .sim__bench svg [fill="#fbfcfd"] { fill: #1f2935; }
-[data-theme="dark"] .sim__plot svg [stroke="#dde3ea"],
-[data-theme="dark"] .sim__bench svg [stroke="#dde3ea"] { stroke: #2a3644; }
-[data-theme="dark"] .sim__plot svg [stroke="#eef1f5"],
-[data-theme="dark"] .sim__bench svg [stroke="#eef1f5"] { stroke: #26313e; }
-[data-theme="dark"] .sim__plot svg [fill="#0b6e6e"],
-[data-theme="dark"] .sim__bench svg [fill="#0b6e6e"] { fill: #3dbfb8; }
-[data-theme="dark"] .sim__plot svg [stroke="#0b6e6e"],
-[data-theme="dark"] .sim__bench svg [stroke="#0b6e6e"] { stroke: #3dbfb8; }
-[data-theme="dark"] .sim__plot svg [fill="#b45309"],
-[data-theme="dark"] .sim__bench svg [fill="#b45309"] { fill: #f0a04b; }
-[data-theme="dark"] .sim__plot svg [stroke="#b45309"],
-[data-theme="dark"] .sim__bench svg [stroke="#b45309"] { stroke: #f0a04b; }
-[data-theme="dark"] .sim__axis { fill: #e6ebf2; }
+/* simulator text uses SVG classes rather than fill attributes */
+[data-theme="dark"] .sim-axis { fill: #e6ebf2; }
 [data-theme="dark"] .sim-tick { fill: #9aa7b8; }
 [data-theme="dark"] .sim__bench { background: var(--surface-2); }
 
