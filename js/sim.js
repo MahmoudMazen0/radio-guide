@@ -49,6 +49,8 @@
   function dB(h) { return 20 * Math.log(Math.max(h, 1e-12)) / Math.LN10; }
 
   var DEFAULTS = { L: 291.5, C: 130, Q: 6.9, stray: 0 };
+  var REDUCE = !!(window.matchMedia &&
+                  window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var BAND = { lo: 530e3, hi: 1700e3 };
   var CH = 9e3;        /* Region 1 medium-wave channel raster */
   var TARGET = 819e3;  /* Table 4 — what the maths predicted  */
@@ -70,6 +72,15 @@
     return (v >= 0 ? '+' : '') + v.toFixed(1);
   }
 
+  /* every tile must be present, or the whole block degrades to "—"
+     instead of throwing halfway through the update */
+  var READOUT_KEYS = ['f0', 'bw', 'flow', 'fhigh', 'delta', 'c819',
+                      'rej', 'ch', 'ring', 'f280', 'f20', 'verdict'];
+  function readoutsReady() {
+    for (var i = 0; i < READOUT_KEYS.length; i++) if (!out[READOUT_KEYS[i]]) return false;
+    return true;
+  }
+
   function readouts() {
     var L = st.L, Q = st.Q, stray = st.stray;
     var f0 = f0of(L, st.C + stray);
@@ -82,7 +93,7 @@
     var rej = -dB(H(TARGET + 10e3, f0, Q));
     var eCyc = Q / Math.PI;
 
-    if (out.f0) {
+    if (readoutsReady()) {
       out.f0.textContent = fmtHz(f0);
       out.bw.textContent = fmtHz(bw);
       out.flow.textContent = fmtHz(fLow);
@@ -302,17 +313,13 @@
   var tip = document.getElementById('simTip');
   var cross = null, crossDot = null, Ymap = function (h) { return h; }, lastR = null;
 
-  function inspect(ev) {
+  /* f (Hz) → the chip, the line and the dot; cssX is where the chip hangs */
+  function showAt(f, cssX) {
     if (!tip || !lastR) return;
-    var ctm = plot.getScreenCTM();
-    if (!ctm) return;
-    var p = plot.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY;
-    var q = p.matrixTransform(ctm.inverse());
-    if (q.x < X0 || q.x > X1 || q.y < Y0 || q.y > Y1) { hideInspect(); return; }
-
-    var f = view.xMin + (q.x - X0) / (X1 - X0) * (view.xMax - view.xMin);
     var hv = H(f, lastR.f0, st.Q);
-    var txt = '<b>' + fmtHz(f) + '</b> <i>· H ' + hv.toFixed(3) + ' (' + dB(hv).toFixed(1) + ' dB)</i>';
+    var dbv = dB(hv);
+    if (Math.abs(dbv) < 0.05) dbv = 0;          /* no "-0.0 dB" at the peak */
+    var txt = '<b>' + fmtHz(f) + '</b> <i>· H ' + hv.toFixed(3) + ' (' + dbv.toFixed(1) + ' dB)</i>';
     if (st.axis === 'band') {
       var n = Math.round(f / CH), snapped = n * CH;
       txt += ' <i>· channel ' + n +
@@ -321,21 +328,34 @@
     if (tip.innerHTML !== txt) tip.innerHTML = txt;
     tip.hidden = false;
 
+    var sx = X0 + (f - view.xMin) / (view.xMax - view.xMin) * (X1 - X0);
     if (cross) {
-      cross.setAttribute('x1', q.x); cross.setAttribute('x2', q.x);
+      cross.setAttribute('x1', sx); cross.setAttribute('x2', sx);
       cross.style.display = '';
     }
     if (crossDot) {
-      crossDot.setAttribute('cx', q.x);
+      crossDot.setAttribute('cx', sx);
       crossDot.setAttribute('cy', clamp(Ymap(hv), Y0, Y1));
       crossDot.style.display = '';
     }
     /* keep the chip inside the plot, in CSS pixels */
     var box = plot.parentNode.getBoundingClientRect();
-    var px = ev.clientX - box.left + 14;
+    var px = (cssX != null ? cssX : sx * (box.width / 720)) + 14;
     px = Math.min(px, Math.max(4, box.width - tip.offsetWidth - 6));
     tip.style.left = Math.max(4, px) + 'px';
     tip.style.top = '8px';
+  }
+
+  function inspect(ev) {
+    if (!tip || !lastR) return;
+    var ctm = plot.getScreenCTM();
+    if (!ctm) return;
+    var p = plot.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY;
+    var q = p.matrixTransform(ctm.inverse());
+    if (q.x < X0 || q.x > X1 || q.y < Y0 || q.y > Y1) { hideInspect(); return; }
+    var f = view.xMin + (q.x - X0) / (X1 - X0) * (view.xMax - view.xMin);
+    var box = plot.parentNode.getBoundingClientRect();
+    showAt(f, ev.clientX - box.left);
   }
   function hideInspect() {
     if (tip) tip.hidden = true;
@@ -345,6 +365,21 @@
   plot.addEventListener('pointermove', inspect);
   plot.addEventListener('pointerdown', inspect);
   plot.addEventListener('pointerleave', hideInspect);
+
+  /* keyboard equivalent: focus the plot, then walk it with the arrow keys */
+  var kbF = null;
+  plot.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') { kbF = null; hideInspect(); return; }
+    if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') return;
+    ev.preventDefault();
+    if (!lastR) return;
+    var span = view.xMax - view.xMin;
+    if (kbF == null) kbF = lastR.f0;
+    kbF = clamp(kbF + (ev.key === 'ArrowRight' ? 1 : -1) * span / 60,
+                view.xMin, view.xMax);
+    showAt(kbF, null);
+  });
+  plot.addEventListener('blur', hideInspect);
 
   /* sample H(f) across the visible window */
   function curve(xMin, xMax, f0, Q, Y) {
@@ -464,6 +499,7 @@
 
   /* ---------- auto-tune ---------- */
   function tuneTo(f) {
+    if (!inC) return;
     var need = Cfor(st.L, f) - st.stray;
     var target = clamp(need, 20, 280);
     animateTo(inC, Math.round(target));
@@ -486,6 +522,11 @@
      a timeout snaps to the exact target so the state always converges. */
   function animateTo(input, target) {
     cancelTween();
+    if (REDUCE) {                      /* no tweening under prefers-reduced-motion */
+      input.value = target;
+      readInputs(); render();
+      return;
+    }
     var from = +input.value, t0 = now(), done = false;
     function finish() {
       if (done) return;
@@ -514,8 +555,10 @@
   var inStray = document.getElementById('inStray');
 
   function readInputs() {
-    st.L = +inL.value; st.C = +inC.value; st.Q = +inQ.value;
-    st.stray = inStray ? +inStray.value : 0;
+    if (inL) st.L = +inL.value || DEFAULTS.L;
+    if (inC) st.C = +inC.value || DEFAULTS.C;
+    if (inQ) st.Q = +inQ.value || DEFAULTS.Q;
+    st.stray = inStray ? (+inStray.value || 0) : 0;
   }
 
   /* Coalesce redraws to one per frame. If rAF is throttled (hidden tab)
@@ -535,13 +578,13 @@
 
   function render() {
     var valL = document.getElementById('valL');
-    if (valL) {
-      valL.textContent = st.L.toFixed(1) + ' \u00B5H';
-      document.getElementById('valC').textContent = st.C + ' pF';
-      document.getElementById('valQ').textContent = st.Q;
-      var vs = document.getElementById('valStray');
-      if (vs) vs.textContent = st.stray + ' pF';
-    }
+    if (valL) valL.textContent = st.L.toFixed(1) + ' \u00B5H';
+    var valC = document.getElementById('valC');
+    if (valC) valC.textContent = st.C + ' pF';
+    var valQ = document.getElementById('valQ');
+    if (valQ) valQ.textContent = st.Q;
+    var vs = document.getElementById('valStray');
+    if (vs) vs.textContent = st.stray + ' pF';
     /* slider fill + screen-reader text */
     fill(inL); fill(inC); fill(inQ); fill(inStray);
     if (inL) inL.setAttribute('aria-valuetext', st.L.toFixed(1) + ' microhenries');
@@ -622,6 +665,7 @@
 
   /* ---------- presets ---------- */
   function preset(name) {
+    if (!inL || !inC || !inQ) return;
     touch();
     cancelTween();
     if (name === 'coil') {
@@ -685,7 +729,8 @@
     tuneTo(Math.round(f / CH) * CH);
   });
 
-  document.getElementById('simReset').addEventListener('click', function () {
+  var resetBtn = document.getElementById('simReset');
+  if (resetBtn) resetBtn.addEventListener('click', function () {
     touch();
     cancelTween();
     inL.value = DEFAULTS.L; inC.value = DEFAULTS.C;
@@ -743,9 +788,9 @@
       if (isFinite(v)) p[a[0]] = v;
     });
     var any = false;
-    if ('L' in p) { inL.value = clamp(p.L, +inL.min, +inL.max); any = true; }
-    if ('C' in p) { inC.value = clamp(p.C, +inC.min, +inC.max); any = true; }
-    if ('Q' in p) { inQ.value = clamp(p.Q, +inQ.min, +inQ.max); any = true; }
+    if ('L' in p && inL) { inL.value = clamp(p.L, +inL.min, +inL.max); any = true; }
+    if ('C' in p && inC) { inC.value = clamp(p.C, +inC.min, +inC.max); any = true; }
+    if ('Q' in p && inQ) { inQ.value = clamp(p.Q, +inQ.min, +inQ.max); any = true; }
     if ('Cs' in p && inStray) { inStray.value = clamp(p.Cs, +inStray.min, +inStray.max); any = true; }
     return any;
   }
