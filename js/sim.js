@@ -60,10 +60,15 @@
 
   /* ---------- readouts ---------- */
   var out = {};
-  ['f0', 'bw', 'flow', 'fhigh', 'delta', 'c819', 'rej', 'ch', 'ring',
+  ['f0', 'bw', 'flow', 'fhigh', 'delta', 'd623', 'c819', 'rej', 'ch', 'ring',
    'f280', 'f20', 'verdict'].forEach(function (k) {
     out[k] = document.getElementById('out_' + k);
   });
+
+  function sign(v) {
+    if (Math.abs(v) < 0.05) v = 0;          /* no "-0.0 %" */
+    return (v >= 0 ? '+' : '') + v.toFixed(1);
+  }
 
   function readouts() {
     var L = st.L, Q = st.Q, stray = st.stray;
@@ -73,6 +78,7 @@
     var bw = fHigh - fLow;
     var c819 = Cfor(L, TARGET) - stray;
     var delta = (f0 - TARGET) / TARGET * 100;
+    var delta623 = (f0 - BENCH) / BENCH * 100;
     var rej = -dB(H(TARGET + 10e3, f0, Q));
     var eCyc = Q / Math.PI;
 
@@ -82,8 +88,15 @@
       out.flow.textContent = fmtHz(fLow);
       out.fhigh.textContent = fmtHz(fHigh);
 
-      out.delta.textContent = (delta >= 0 ? '+' : '') + delta.toFixed(1) + ' %';
-      out.delta.className = Math.abs(delta) < 1 ? 'is-ok' : 'is-off';
+      /* the two delta chips live inside the hero tile */
+      if (out.delta) {
+        out.delta.textContent = 'Δ vs 819 · ' + sign(delta) + ' %';
+        out.delta.className = 'delta ' + (Math.abs(delta) < 1 ? 'is-ok' : 'is-off');
+      }
+      if (out.d623) {
+        out.d623.textContent = 'Δ vs 623 · ' + sign(delta623) + ' %';
+        out.d623.className = 'delta ' + (Math.abs(delta623) < 1 ? 'is-ok' : 'is-off');
+      }
 
       out.c819.textContent = c819.toFixed(1) + ' pF';
       out.rej.textContent = rej.toFixed(1) + ' dB';
@@ -106,6 +119,36 @@
       }
     }
     return { f0: f0, fLow: fLow, fHigh: fHigh, bw: bw };
+  }
+
+  /* ---------- live narrative: the page rewrites its own caption ---------- */
+  var storyEl = document.getElementById('simStory');
+  function story(r) {
+    if (!storyEl) return;
+    var s = st.stray, f0 = r.f0;
+    var d819 = (f0 - TARGET) / TARGET * 100;
+    var d623 = (f0 - BENCH) / BENCH * 100;
+    var h;
+    if (s > 0 && Math.abs(d623) < 1.5) {
+      h = 'Counting <span class="hi">' + s + ' pF</span> of stray / probe capacitance pulls f<sub>0</sub> to ' +
+          '<span class="hi">' + fmtHz(f0) + '</span> — <span class="ok">within ' + Math.abs(d623).toFixed(1) +
+          ' %</span> of the <b>623 kHz</b> we actually read on the bench (Table 5). ' +
+          'The gap between 819 and 623 is the whole story of M1.';
+    } else if (s === 0 && Math.abs(d819) < 1) {
+      h = 'Nothing extra counted, so the tank sits at <span class="hi">' + fmtHz(f0) + '</span> — ' +
+          '<span class="ok">' + Math.abs(d819).toFixed(1) + ' % off</span> the <b>819 kHz</b> the maths ' +
+          'predicted (Table 4). Put 100 pF on the probe slider and watch it fall.';
+    } else if (s > 0) {
+      h = 'With <span class="hi">' + s + ' pF</span> joined to the capacitor, f<sub>0</sub> drops to ' +
+          '<span class="hi">' + fmtHz(f0) + '</span> (' + sign(d819) + ' % against 819, ' + sign(d623) +
+          ' % against 623). The coil and the capacitor never changed — only the capacitance we forgot.';
+    } else {
+      h = 'f<sub>0</sub> = <span class="hi">' + fmtHz(f0) + '</span> from L ' + st.L.toFixed(1) +
+          ' µH and C ' + st.C + ' pF: ' + sign(d819) + ' % against the 819 kHz design, bandwidth ' +
+          '<span class="hi">' + fmtHz(r.bw) + '</span>, and ' + st.Q.toFixed(1) +
+          (st.Q < 1.6 ? ' cycle' : ' cycles') + ' of ring-down per 1/e.';
+    }
+    if (storyEl.innerHTML !== h) storyEl.innerHTML = h;
   }
 
   /* ---------- response plot ---------- */
@@ -243,7 +286,65 @@
       plot.appendChild(el('line', { x1: X0 + 8, x2: X0 + 34, y1: Y1 - 34, y2: Y1 - 34, 'class': 'sim-ghost' }));
       plot.appendChild(el('text', { x: X0 + 40, y: Y1 - 30, 'class': 'sim-hint' }, 'a good coil · Q 30'));
     }
+
+    /* crosshair furniture — recreated on every draw, moved by pointermove only */
+    Ymap = Y;
+    crossDot = el('circle', { cx: X0, cy: Y(1), r: 4.5, 'class': 'sim-cross-dot' });
+    cross = el('line', { x1: X0, x2: X0, y1: Y0, y2: Y1, 'class': 'sim-cross' });
+    cross.style.display = 'none';
+    crossDot.style.display = 'none';
+    plot.appendChild(cross);
+    plot.appendChild(crossDot);
+    if (tip) tip.hidden = true;
   }
+
+  /* ---------- crosshair read-out ---------- */
+  var tip = document.getElementById('simTip');
+  var cross = null, crossDot = null, Ymap = function (h) { return h; }, lastR = null;
+
+  function inspect(ev) {
+    if (!tip || !lastR) return;
+    var ctm = plot.getScreenCTM();
+    if (!ctm) return;
+    var p = plot.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY;
+    var q = p.matrixTransform(ctm.inverse());
+    if (q.x < X0 || q.x > X1 || q.y < Y0 || q.y > Y1) { hideInspect(); return; }
+
+    var f = view.xMin + (q.x - X0) / (X1 - X0) * (view.xMax - view.xMin);
+    var hv = H(f, lastR.f0, st.Q);
+    var txt = '<b>' + fmtHz(f) + '</b> <i>· H ' + hv.toFixed(3) + ' (' + dB(hv).toFixed(1) + ' dB)</i>';
+    if (st.axis === 'band') {
+      var n = Math.round(f / CH), snapped = n * CH;
+      txt += ' <i>· channel ' + n +
+             (Math.abs(snapped - f) > 1000 ? ' · tune lands on ' + fmtHz(snapped) : '') + '</i>';
+    }
+    if (tip.innerHTML !== txt) tip.innerHTML = txt;
+    tip.hidden = false;
+
+    if (cross) {
+      cross.setAttribute('x1', q.x); cross.setAttribute('x2', q.x);
+      cross.style.display = '';
+    }
+    if (crossDot) {
+      crossDot.setAttribute('cx', q.x);
+      crossDot.setAttribute('cy', clamp(Ymap(hv), Y0, Y1));
+      crossDot.style.display = '';
+    }
+    /* keep the chip inside the plot, in CSS pixels */
+    var box = plot.parentNode.getBoundingClientRect();
+    var px = ev.clientX - box.left + 14;
+    px = Math.min(px, Math.max(4, box.width - tip.offsetWidth - 6));
+    tip.style.left = Math.max(4, px) + 'px';
+    tip.style.top = '8px';
+  }
+  function hideInspect() {
+    if (tip) tip.hidden = true;
+    if (cross) cross.style.display = 'none';
+    if (crossDot) crossDot.style.display = 'none';
+  }
+  plot.addEventListener('pointermove', inspect);
+  plot.addEventListener('pointerdown', inspect);
+  plot.addEventListener('pointerleave', hideInspect);
 
   /* sample H(f) across the visible window */
   function curve(xMin, xMax, f0, Q, Y) {
@@ -441,19 +542,58 @@
       var vs = document.getElementById('valStray');
       if (vs) vs.textContent = st.stray + ' pF';
     }
+    /* slider fill + screen-reader text */
+    fill(inL); fill(inC); fill(inQ); fill(inStray);
+    if (inL) inL.setAttribute('aria-valuetext', st.L.toFixed(1) + ' microhenries');
+    if (inC) inC.setAttribute('aria-valuetext', st.C + ' picofarads');
+    if (inStray) inStray.setAttribute('aria-valuetext', st.stray + ' picofarads of stray capacitance');
+    if (inQ) inQ.setAttribute('aria-valuetext', 'quality factor ' + st.Q);
+
+    /* the schematic quotes the live values */
+    var schL = document.getElementById('schL');
+    if (schL) schL.textContent = st.L.toFixed(1) + ' \u00B5H';
+    var schC = document.getElementById('schC');
+    if (schC) schC.textContent = (st.C + st.stray) + ' pF';
+
     var r = readouts();
+    lastR = r;
+    story(r);
+    markPresets();
     draw(r);
     ring(r.f0, st.Q);
     bench(st.L, r);
+    queueHash();
+  }
+
+  function fill(input) {
+    if (!input) return;
+    var min = +input.min, max = +input.max, v = +input.value;
+    var pct = max > min ? (v - min) / (max - min) * 100 : 0;
+    input.style.setProperty('--pct', pct.toFixed(1) + '%');
   }
 
   [inL, inC, inQ, inStray].forEach(function (s) {
-    if (s) s.addEventListener('input', function () { readInputs(); schedule(); });
+    if (s) s.addEventListener('input', function () { touch(); readInputs(); schedule(); });
   });
   [inC].forEach(function (s) {
     if (!s) return;
     s.addEventListener('pointerdown', cancelTween);
     s.addEventListener('keydown', cancelTween);
+  });
+
+  /* highlight the slider while you are actually dragging it */
+  [inL, inC, inQ, inStray].forEach(function (s) {
+    if (!s) return;
+    var ctrl = s.closest ? s.closest('.ctrl') : null;
+    if (!ctrl) return;
+    var on = function () { ctrl.classList.add('is-live'); };
+    var off = function () { ctrl.classList.remove('is-live'); };
+    s.addEventListener('pointerdown', on);
+    s.addEventListener('keydown', on);
+    s.addEventListener('pointerup', off);
+    s.addEventListener('pointercancel', off);
+    s.addEventListener('keyup', off);
+    s.addEventListener('blur', off);
   });
 
   /* toolbar */
@@ -469,6 +609,7 @@
   if (bar) bar.addEventListener('click', function (ev) {
     var b = ev.target.closest ? ev.target.closest('button') : null;
     if (!b || !bar.contains(b)) return;
+    touch();
     if (b.hasAttribute('data-axis')) { st.axis = b.getAttribute('data-axis'); pressGroup(b, 'axis'); status(''); render(); }
     else if (b.hasAttribute('data-unit')) { st.unit = b.getAttribute('data-unit'); pressGroup(b, 'unit'); status(''); render(); }
     else if (b.id === 'btnGhost') {
@@ -477,13 +618,64 @@
       b.classList.toggle('is-on', st.ghost);
       render();
     }
-    else if (b.id === 'btn819') { tuneTo(TARGET); }
-    else if (b.id === 'btn623') { tuneTo(BENCH); }
   });
+
+  /* ---------- presets ---------- */
+  function preset(name) {
+    touch();
+    cancelTween();
+    if (name === 'coil') {
+      inL.value = DEFAULTS.L; inC.value = DEFAULTS.C; inQ.value = DEFAULTS.Q;
+      if (inStray) inStray.value = 0;
+      readInputs(); render();
+      status('Our coil as drawn: L 291.5 µH · C 130 pF · no stray · Q 6.9.');
+    } else if (name === '819') {
+      if (inStray) inStray.value = 0;
+      readInputs();
+      tuneTo(TARGET);
+    } else if (name === '623') {
+      if (inStray) inStray.value = 100;
+      readInputs();
+      tuneTo(BENCH);
+    } else if (name === 'probe') {
+      if (inStray) inStray.value = 100;
+      inC.value = DEFAULTS.C;
+      readInputs(); render();
+      status('The mistake: the ×1 probe sits across the tank, so 100 pF joins C — and f₀ falls to 614.7 kHz.');
+    }
+  }
+
+  var presets = document.querySelector('.sim__presets');
+  if (presets) presets.addEventListener('click', function (ev) {
+    var b = ev.target.closest ? ev.target.closest('button') : null;
+    if (!b || !presets.contains(b)) return;
+    var id = b.id;
+    if (id === 'prCoil') preset('coil');
+    else if (id === 'pr819') preset('819');
+    else if (id === 'pr623') preset('623');
+    else if (id === 'prProbe') preset('probe');
+  });
+
+  /* light up every preset the current state already satisfies */
+  function markPresets() {
+    var d819 = Math.abs((lastR ? lastR.f0 : 0) - TARGET) / TARGET * 100;
+    var d623 = Math.abs((lastR ? lastR.f0 : 0) - BENCH) / BENCH * 100;
+    var state = {
+      prCoil: st.L === DEFAULTS.L && st.C === DEFAULTS.C && st.stray === 0 && st.Q === DEFAULTS.Q,
+      pr819: st.stray === 0 && d819 < 1,
+      pr623: st.stray === 100 && d623 < 1.5,
+      prProbe: st.stray === 100 && st.C === DEFAULTS.C
+    };
+    for (var id in state) {
+      var b = document.getElementById(id);
+      if (b) b.classList.toggle('is-on', !!state[id]);
+    }
+  }
 
   /* click the band to tune (9 kHz channel snapping) */
   plot.addEventListener('click', function (ev) {
     if (st.axis !== 'band') return;
+    touch();
     var ctm = plot.getScreenCTM();
     if (!ctm) return;
     var p = plot.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY;
@@ -494,6 +686,7 @@
   });
 
   document.getElementById('simReset').addEventListener('click', function () {
+    touch();
     cancelTween();
     inL.value = DEFAULTS.L; inC.value = DEFAULTS.C;
     inQ.value = DEFAULTS.Q; if (inStray) inStray.value = DEFAULTS.stray;
@@ -509,6 +702,64 @@
     render();
   });
 
+  /* ---------- bench / schematic tabs ---------- */
+  var tabs = document.querySelectorAll('.sim__tab');
+  for (var ti = 0; ti < tabs.length; ti++) {
+    tabs[ti].addEventListener('click', function () {
+      var target = this.getAttribute('aria-controls');
+      for (var j = 0; j < tabs.length; j++) {
+        var on = tabs[j] === this;
+        tabs[j].classList.toggle('is-on', on);
+        tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
+      }
+      var panels = document.querySelectorAll('.sim__panel');
+      for (var k = 0; k < panels.length; k++) panels[k].hidden = panels[k].id !== target;
+    });
+  }
+
+  /* ---------- shareable state: L / C / Cs / Q live in the URL hash ----------
+     Only written after a real interaction, so clicking a TOC anchor is never
+     clobbered by a background redraw, and never more than once per 500 ms
+     (history.replaceState is rate-limited by the browser). */
+  var hashT = null, touched = false;
+  function touch() { touched = true; }
+  function writeHash() {
+    if (!touched) return;
+    var q = 'L=' + st.L + '&C=' + st.C + '&Cs=' + st.stray + '&Q=' + st.Q;
+    if (location.hash.replace(/^#/, '') === q) return;
+    try { history.replaceState(null, '', '#' + q); } catch (e) { /* private mode */ }
+  }
+  function queueHash() {
+    if (!touched || hashT) return;
+    hashT = setTimeout(function () { hashT = null; writeHash(); }, 500);
+  }
+  function readHash() {
+    var h = location.hash.replace(/^#/, '');
+    if (!h) return false;
+    var p = {};
+    h.split('&').forEach(function (kv) {
+      var a = kv.split('=');
+      var v = parseFloat(a[1]);
+      if (isFinite(v)) p[a[0]] = v;
+    });
+    var any = false;
+    if ('L' in p) { inL.value = clamp(p.L, +inL.min, +inL.max); any = true; }
+    if ('C' in p) { inC.value = clamp(p.C, +inC.min, +inC.max); any = true; }
+    if ('Q' in p) { inQ.value = clamp(p.Q, +inQ.min, +inQ.max); any = true; }
+    if ('Cs' in p && inStray) { inStray.value = clamp(p.Cs, +inStray.min, +inStray.max); any = true; }
+    return any;
+  }
+
+  var share = document.getElementById('simShare');
+  if (share) share.addEventListener('click', function () {
+    var url = location.href;
+    function done() { status('✓ Link copied — paste it anywhere to reopen this exact state.'); }
+    function failed() { status('Copy this link: ' + url); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, failed);
+    } else failed();
+  });
+
   /* pause the flowing dashes and the ring playhead while off-screen */
   if ('IntersectionObserver' in window) {
     var root = document.querySelector('.sim');
@@ -519,6 +770,8 @@
     }
   }
 
+  var fromLink = readHash();
   readInputs();
+  if (fromLink) status('✓ State restored from the link.');
   render();
 })();

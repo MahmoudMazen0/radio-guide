@@ -209,11 +209,14 @@
         <button type="button" class="seg__b" data-unit="db" aria-pressed="false">dB</button>
       </div>
       <button type="button" class="chip" id="btnGhost" aria-pressed="false">Compare a good coil (Q 30)</button>
-      <div class="seg" role="group" aria-label="Auto tune">
-        <span class="seg__cap">Tune to</span>
-        <button type="button" class="seg__b" id="btn819">819 kHz</button>
-        <button type="button" class="seg__b" id="btn623">623 kHz</button>
-      </div>
+    </div>
+
+    <div class="sim__presets" role="group" aria-label="Preset states">
+      <span class="seg__cap">Presets</span>
+      <button type="button" class="chip" id="prCoil">Our coil · 291.5 µH / 130 pF</button>
+      <button type="button" class="chip" id="pr819">Table 4 · designed for 819</button>
+      <button type="button" class="chip" id="pr623">Bench · what we read (623)</button>
+      <button type="button" class="chip" id="prProbe">The mistake · ×1 probe (100 pF)</button>
     </div>
 
     <div class="sim__controls">
@@ -239,6 +242,52 @@
       </label>
     </div>
 
+    <div class="sim__plot">
+      <svg id="simPlot" viewBox="0 0 720 320" role="img" tabindex="0"
+           aria-label="Plot of the tank’s normalised response against frequency, with markers at the resonant frequency and at the two −3 dB points. Move the pointer across it to read any frequency."></svg>
+      <div class="sim__tip" id="simTip" hidden aria-hidden="true"></div>
+    </div>
+
+    <p class="sim__story" id="simStory">—</p>
+
+    <div class="sim__readout">
+      <div class="stat stat--hero">
+        <b>Resonant f<sub>0</sub></b>
+        <span id="out_f0">—</span>
+        <em class="deltas">
+          <i class="delta" id="out_delta">Δ vs 819 · —</i>
+          <i class="delta" id="out_d623">Δ vs 623 · —</i>
+        </em>
+      </div>
+      <div class="stat"><b>−3 dB bandwidth</b><span id="out_bw">—</span></div>
+      <div class="stat"><b>Rejection at ±10 kHz</b><span id="out_rej">—</span></div>
+      <div class="stat"><b>MW channels in band</b><span id="out_ch">—</span></div>
+      <div class="stat"><b>Cycles to 1/e</b><span id="out_ring">—</span></div>
+      <div class="stat"><b>f<sub>low</sub></b><span id="out_flow">—</span></div>
+      <div class="stat"><b>f<sub>high</sub></b><span id="out_fhigh">—</span></div>
+      <div class="stat"><b>C for 819 kHz</b><span id="out_c819">—</span></div>
+      <div class="stat"><b>Band at 280 pF</b><span id="out_f280">—</span></div>
+      <div class="stat"><b>Band at 20 pF</b><span id="out_f20">—</span></div>
+    </div>
+
+    <div class="sim__ring">
+      <p class="sim__sub">Time domain · what the tank does to a kick at TP1</p>
+      <svg id="simRing" viewBox="0 0 720 150" role="img"
+           aria-label="The tank’s ring-down: a damped sine at TP1 whose envelope falls by 1/e after Q divided by pi cycles."></svg>
+      <p class="sim__caption sim__caption--tight">
+        A poor tank rings for a cycle or two and dies; a good one keeps going. That count is exactly
+        <i>Q / π</i> — which is why Q is not just a number on the slider.
+      </p>
+    </div>
+
+    <div class="sim__tabs" role="tablist" aria-label="Physical view">
+      <button type="button" class="sim__tab is-on" role="tab" id="tabBench"
+              aria-selected="true" aria-controls="panelBench" data-panel="bench">Bench</button>
+      <button type="button" class="sim__tab" role="tab" id="tabSch"
+              aria-selected="false" aria-controls="panelSch" data-panel="sch">Schematic</button>
+    </div>
+
+    <div class="sim__panel is-on" id="panelBench" role="tabpanel" aria-labelledby="tabBench">
     <div class="sim__bench">
       <svg id="simBench" viewBox="0 0 760 470" role="img" aria-label="A bench view of M1 drawn like Tinkercad: a function generator drives a five-turn test loop a few centimetres from the 75-turn coil on its PVC pipe; the coil and the blue tuning capacitor form the tank, and a 1N60P diode reaches TP3, where a 15 kilo-ohm resistor and a 3.3 nano-farad capacitor go to ground. A dial below shows the frequency being tuned.">
 
@@ -364,39 +413,77 @@
       on the move.
     </p>
 
-    <div class="sim__plot">
-      <svg id="simPlot" viewBox="0 0 720 320" role="img"
-           aria-label="Plot of the tank’s normalised response against frequency, with markers at the resonant frequency and at the two −3 dB points."></svg>
     </div>
 
-    <div class="sim__ring">
-      <p class="sim__sub">Time domain · what the tank does to a kick at TP1</p>
-      <svg id="simRing" viewBox="0 0 720 150" role="img"
-           aria-label="The tank’s ring-down: a damped sine at TP1 whose envelope falls by 1/e after Q divided by pi cycles."></svg>
-      <p class="sim__caption sim__caption--tight">
-        A poor tank rings for a cycle or two and dies; a good one keeps going. That count is exactly
-        <i>Q / π</i> — which is why Q is not just a number on the slider.
+    <div class="sim__panel" id="panelSch" role="tabpanel" aria-labelledby="tabSch" hidden>
+      <svg id="simSch" viewBox="0 0 760 330" role="img"
+           aria-label="Schematic of the simulated tank: an induced current source drives a parallel LC tank made of the 291.5 microhenry coil and the tuning capacitor plus stray capacitance; the tank voltage reaches a 1N60P diode detector whose RC load feeds the output at TP3.">
+
+        <!-- rails -->
+        <path class="sim-wire" d="M90,70 H670"/>
+        <path class="sim-wire" d="M90,270 H670"/>
+        <path class="sim-wire" d="M90,70 V137 M90,193 V270"/>
+
+        <!-- induced current from the test loop -->
+        <circle class="sch-src" cx="90" cy="165" r="28"/>
+        <path class="sim-wire" d="M90,182 V152"/>
+        <path class="sch-arrow" d="M84,160 L90,149 L96,160 Z"/>
+        <text class="sch-lbl" x="90" y="222" text-anchor="middle">I&#8202;ind</text>
+        <text class="sch-val" x="90" y="242" text-anchor="middle">from the test loop</text>
+
+        <!-- inductor -->
+        <path class="sim-wire" d="M250,70 V120"/>
+        <path class="sim-comp" d="M250,120 a10,10 0 0 1 0,20 a10,10 0 0 1 0,20 a10,10 0 0 1 0,20 a10,10 0 0 1 0,20 a10,10 0 0 1 0,20"/>
+        <path class="sim-wire" d="M250,220 V270"/>
+        <text class="sch-lbl" x="272" y="158">L</text>
+        <text class="sch-val" id="schL" x="272" y="180">291.5 µH</text>
+
+        <!-- tuning capacitor + stray -->
+        <path class="sim-wire" d="M400,70 V155"/>
+        <path class="sim-comp" d="M378,155 H422 M378,172 H422"/>
+        <path class="sim-wire" d="M400,172 V270"/>
+        <text class="sch-lbl" x="432" y="158">C + C&#8202;s</text>
+        <text class="sch-val" id="schC" x="432" y="180">130 pF</text>
+
+        <!-- detector: 1N60P -->
+        <path class="sim-wire" d="M560,70 V95"/>
+        <path class="sim-comp sch-diode" d="M547,95 H573 L560,119 Z"/>
+        <path class="sim-comp" d="M546,119 H574"/>
+        <path class="sim-wire" d="M560,119 V150"/>
+        <circle class="sch-node" cx="560" cy="150" r="5"/>
+        <text class="sch-lbl" x="578" y="146">TP3</text>
+        <text class="sch-val" x="578" y="122">1N60P</text>
+
+        <!-- RC load -->
+        <path class="sim-wire" d="M560,150 H670 M560,150 V188"/>
+        <path class="sim-comp sch-box" d="M548,188 h24 v52 h-24 Z"/>
+        <path class="sim-wire" d="M560,240 V270"/>
+        <text class="sch-val" x="578" y="220">R 15 k&#8486;</text>
+
+        <path class="sim-wire" d="M670,150 V200"/>
+        <path class="sim-comp" d="M648,200 H692 M648,215 H692"/>
+        <path class="sim-wire" d="M670,215 V270"/>
+        <text class="sch-val" x="700" y="212">C 3.3 nF</text>
+
+        <!-- ground -->
+        <path class="sim-wire" d="M360,270 V286 M344,286 H376 M350,294 H370 M356,302 H364"/>
+        <text class="sch-val" x="330" y="292" text-anchor="end">0 V</text>
+      </svg>
+      <p class="sim__caption">
+        The model behind the plot: the test loop induces a current into the parallel tank, the tank
+        answers with <i>V = I · Z</i>, and <i>Z</i> peaks at <i>f</i><sub>0</sub>. Everything the
+        sliders change lives in this picture — <i>L</i>, <i>C</i>, the stray <i>C</i><sub>s</sub>,
+        and the coil losses that set <i>Q</i>.
       </p>
-    </div>
-
-    <div class="sim__readout">
-      <div class="stat stat--hero"><b>Resonant f<sub>0</sub></b><span id="out_f0">—</span></div>
-      <div class="stat"><b>−3 dB bandwidth</b><span id="out_bw">—</span></div>
-      <div class="stat"><b>Δ vs 819 kHz</b><span id="out_delta">—</span></div>
-      <div class="stat"><b>Rejection at ±10 kHz</b><span id="out_rej">—</span></div>
-      <div class="stat"><b>MW channels in band</b><span id="out_ch">—</span></div>
-      <div class="stat"><b>Cycles to 1/e</b><span id="out_ring">—</span></div>
-      <div class="stat"><b>f<sub>low</sub></b><span id="out_flow">—</span></div>
-      <div class="stat"><b>f<sub>high</sub></b><span id="out_fhigh">—</span></div>
-      <div class="stat"><b>C for 819 kHz</b><span id="out_c819">—</span></div>
-      <div class="stat"><b>Band at 280 pF</b><span id="out_f280">—</span></div>
-      <div class="stat"><b>Band at 20 pF</b><span id="out_f20">—</span></div>
     </div>
 
     <div class="sim__foot">
       <p class="verdict" id="out_verdict">—</p>
       <span class="sim__status" id="simStatus" role="status" aria-live="polite"></span>
-      <button class="ghost" id="simReset" type="button">Reset to our values</button>
+      <span class="sim__actions">
+        <button class="ghost" id="simShare" type="button">Copy link to this state</button>
+        <button class="ghost" id="simReset" type="button">Reset to our values</button>
+      </span>
     </div>
   </div>
 

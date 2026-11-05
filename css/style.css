@@ -564,13 +564,62 @@ a.milestone:hover {
   color: var(--muted);
   margin-top: 0.3rem;
 }
+/* ---------- range slider: a filled track and a thumb you can aim at ---------- */
 input[type="range"] {
+  --pct: 50%;
   display: block;
   width: 100%;
-  margin-top: 0.4rem;
-  accent-color: var(--accent);
+  height: 26px;
+  margin-top: 0.35rem;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
 }
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(to right,
+    var(--accent) 0 var(--pct), var(--surface-2) var(--pct) 100%);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+input[type="range"]::-moz-range-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2.5px solid var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .28);
+  transition: transform .12s ease;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2.5px solid var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .28);
+}
+input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.14); }
+input[type="range"]:focus-visible { outline: none; }
+input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px var(--accent-soft); }
+input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px var(--accent-soft); }
+.ctrl.is-live .ctrl__label output { color: var(--accent-2); }
+.ctrl.is-live .ctrl__hint { color: var(--accent); }
 .sim__plot { margin: 0.4rem 0 0.2rem; }
 .sim__plot svg { width: 100%; height: auto; display: block; }
 
@@ -596,6 +645,130 @@ input[type="range"] {
 .sim-lbl.sim-live { fill: var(--accent); }
 .sim-dot   { fill: var(--svg-bg); stroke: var(--accent); stroke-width: 2.5; }
 .sim-dot2  { fill: var(--svg-bg); stroke: var(--accent-2); stroke-width: 2.5; }
+
+/* ---------- crosshair read-out ---------- */
+.sim__plot { position: relative; }
+.sim__tip {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--svg-ink);
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
+}
+.sim__tip[hidden] { display: none; }
+.sim__tip i { font-style: normal; color: var(--muted); font-weight: 600; }
+.sim-cross     { fill: none; stroke: var(--accent-2); stroke-dasharray: 3 3; opacity: .85; }
+.sim-cross-dot { fill: var(--svg-bg); stroke: var(--accent-2); stroke-width: 2.5; }
+
+/* ---------- live narrative line ---------- */
+.sim__story {
+  margin: 0.6rem 0 0.2rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  font-size: 0.87rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.sim__story b { color: var(--ink); }
+.sim__story .hi { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sim__story .ok { color: var(--good); font-weight: 700; }
+
+/* ---------- preset chips ---------- */
+.sim__presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.45rem;
+  margin: -0.45rem 0 1.05rem;
+}
+.sim__presets .seg__cap { padding: 0 0.35rem 0 0; }
+
+/* ---------- hero read-out with delta chips ---------- */
+.deltas { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+.delta {
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  padding: 0.12rem 0.48rem;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.delta.is-ok  { color: var(--good); background: var(--good-soft); border-color: rgba(22, 121, 74, .3); }
+.delta.is-off { color: var(--accent-2); border-color: rgba(194, 65, 12, .3); }
+
+/* ---------- bench / schematic tabs ---------- */
+.sim__tabs {
+  display: flex;
+  gap: 0.3rem;
+  margin: 1.2rem 0 0.7rem;
+  border-bottom: 1px solid var(--border);
+}
+.sim__tab {
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 0.42rem 1rem;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color .15s ease, background .15s ease;
+}
+.sim__tab:hover { color: var(--accent); }
+.sim__tab.is-on {
+  color: var(--accent);
+  background: var(--surface-2);
+  border-color: var(--border);
+  font-weight: 700;
+}
+.sim__tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.sim__panel[hidden] { display: none; }
+
+/* ---------- schematic ---------- */
+.sim__panel svg { width: 100%; height: auto; display: block; }
+.sim-wire {
+  fill: none;
+  stroke: var(--svg-ink);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sim-comp {
+  fill: none;
+  stroke: var(--svg-ink);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sch-diode { fill: var(--svg-bg); }
+.sch-box   { fill: var(--svg-bg); }
+.sch-src   { fill: var(--svg-bg); stroke: var(--svg-ink); stroke-width: 2.5; }
+.sch-arrow { fill: var(--svg-ink); }
+.sch-node  { fill: var(--accent); }
+.sch-lbl   { font-size: 14px; font-weight: 700; fill: var(--svg-ink); font-family: inherit; }
+.sch-val   { font-size: 13px; fill: var(--svg-mut); font-family: inherit; }
+
+/* ---------- foot actions ---------- */
+.sim__actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
 /* ---- ring-down panel ---- */
 .sim__ring { margin: .5rem 0 .2rem; }
@@ -709,6 +882,14 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); }
   .table-wrap { -webkit-overflow-scrolling: touch; }
   .sim__controls { grid-template-columns: 1fr; }
   .sim__readout { grid-template-columns: repeat(2, 1fr); }
+  .sim { padding: 1rem 0.9rem; }
+  .sim__bar, .sim__presets { gap: 0.4rem; }
+  .seg { flex-wrap: wrap; border-radius: 14px; padding: 0.3rem 0.45rem; }
+  .sim__tip { font-size: 0.7rem; padding: 0.25rem 0.45rem; }
+  .sim__foot { flex-direction: column; align-items: stretch; }
+  .sim__actions { display: flex; }
+  .sim__actions .ghost { flex: 1 1 auto; text-align: center; }
+  .stat--hero span { font-size: 1.05rem; }
   figure img { border-radius: 8px; }
 }
 @media (min-width: 621px) and (max-width: 760px) {
