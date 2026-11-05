@@ -20,6 +20,15 @@
   --good-soft: #e7f5ee;
   --code-bg: #f0f2f5;
 
+  /* inline-SVG palette — every drawn element reads these, so the
+     dark theme comes for free without per-colour attribute rules */
+  --svg-bg: #fbfcfd;
+  --svg-grid: #eef1f5;
+  --svg-axis: #9aa4b1;
+  --svg-line: #dde3ea;
+  --svg-ink: #1a2029;
+  --svg-mut: #5b6675;
+
   /* layout */
   --maxw: 880px;
   --radius: 10px;
@@ -41,6 +50,13 @@
   --good-soft: #173621;
   --code-bg: #1f2935;
   --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.4);
+
+  --svg-bg: #1f2935;
+  --svg-grid: #26313e;
+  --svg-axis: #7a879a;
+  --svg-line: #2a3644;
+  --svg-ink: #e6ebf2;
+  --svg-mut: #9aa7b8;
 }
 
 * { box-sizing: border-box; }
@@ -465,6 +481,61 @@ a.milestone:hover {
   margin-bottom: 1rem;
 }
 .sim__head h3 { margin: 0; }
+
+/* ---------- simulator toolbar (axis / scale / compare / tune) ---------- */
+.sim__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem .7rem;
+  align-items: center;
+  margin: 0 0 1rem;
+}
+.seg {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  padding: .22rem .4rem .22rem .3rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.seg__cap {
+  font-size: .68rem;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0 .3rem 0 .35rem;
+}
+.seg__b, .chip {
+  font: inherit;
+  font-size: .79rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: .26rem .7rem;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.seg__b:hover, .chip:hover { color: var(--accent); }
+.seg__b.is-on, .chip.is-on {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: rgba(11, 110, 110, .35);
+  font-weight: 700;
+}
+.seg__b:focus-visible, .chip:focus-visible, .ghost:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.chip {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+.chip.is-on { background: var(--accent-soft); }
+
 .sim__controls {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
@@ -486,6 +557,13 @@ a.milestone:hover {
   font-variant-numeric: tabular-nums;
   font-size: 0.95rem;
 }
+.ctrl__hint {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
 input[type="range"] {
   display: block;
   width: 100%;
@@ -495,9 +573,44 @@ input[type="range"] {
 }
 .sim__plot { margin: 0.4rem 0 0.2rem; }
 .sim__plot svg { width: 100%; height: auto; display: block; }
-.sim-tick { font-size: 12px; fill: #5b6675; font-family: inherit; }
-.sim-note  { font-size: 12px; font-family: inherit; }
-.sim-axis  { font-size: 13px; fill: #1a2029; font-family: inherit; }
+
+/* ---- drawn-SVG classes: colour comes from --svg-* tokens ---- */
+.sim-tick  { font-size: 12px; fill: var(--svg-mut); font-family: inherit; }
+.sim-note  { font-size: 12px; font-family: inherit; fill: var(--accent-2); }
+.sim-axis  { font-size: 13px; fill: var(--svg-ink); font-family: inherit; }
+.sim-hint  { font-size: 12px; font-family: inherit; fill: var(--svg-mut); font-style: italic; }
+.sim-frame { fill: var(--svg-bg); stroke: var(--svg-line); }
+.sim-grid  { stroke: var(--svg-grid); }
+.sim-base  { stroke: var(--svg-axis); }
+.sim-raster { fill: none; stroke: var(--svg-grid); stroke-width: 1; opacity: .55; }
+.sim-raster--major { opacity: .9; }
+.sim-wave  { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; }
+.sim-ghost { fill: none; stroke: var(--svg-axis); stroke-width: 2; stroke-dasharray: 7 5; }
+.sim-envelope { fill: none; stroke: var(--accent-2); stroke-width: 1.3; stroke-dasharray: 4 4; opacity: .9; }
+.sim-minus3 { stroke: var(--accent-2); stroke-dasharray: 5 4; }
+.sim-shade { fill: var(--accent-soft); opacity: .5; }
+.sim-mark  { stroke: var(--accent-2); stroke-dasharray: 6 4; cursor: pointer; }
+.sim-mark2 { stroke: var(--svg-mut); stroke-dasharray: 3 4; cursor: pointer; }
+.sim-lbl   { font-size: 12px; font-weight: 700; fill: var(--accent-2); cursor: pointer; }
+.sim-lbl2  { font-size: 12px; font-weight: 700; fill: var(--svg-mut); cursor: pointer; }
+.sim-lbl.sim-live { fill: var(--accent); }
+.sim-dot   { fill: var(--svg-bg); stroke: var(--accent); stroke-width: 2.5; }
+.sim-dot2  { fill: var(--svg-bg); stroke: var(--accent-2); stroke-width: 2.5; }
+
+/* ---- ring-down panel ---- */
+.sim__ring { margin: .5rem 0 .2rem; }
+.sim__ring svg { width: 100%; height: auto; display: block; }
+.sim__sub {
+  font-size: .74rem; text-transform: uppercase; letter-spacing: .07em;
+  font-weight: 700; color: var(--muted); margin: .8rem 0 .3rem;
+}
+.sim__caption--tight { margin-top: .45rem; margin-bottom: .2rem; font-size: .82rem; }
+.ring-head {
+  stroke: var(--accent); stroke-width: 1.5; opacity: .55;
+  animation: ringsweep 2.6s linear infinite;
+}
+@keyframes ringsweep { from { transform: translateX(0); } to { transform: translateX(630px); } }
+.sim--hidden .sig, .sim--hidden .ring-head { animation-play-state: paused; }
 .sim__readout {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
@@ -525,6 +638,16 @@ input[type="range"] {
 }
 .stat--hero { background: var(--accent-soft); border-color: rgba(11, 110, 110, 0.3); }
 .stat--hero span { color: var(--accent); font-size: 1.2rem; }
+.stat span.is-ok  { color: var(--good); }
+.stat span.is-off { color: var(--accent-2); }
+.sim__status {
+  font-size: 0.84rem;
+  font-weight: 600;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.sim__status.is-ok  { color: var(--good); }
+.sim__status.is-off { color: var(--accent-2); }
 .sim__foot {
   display: flex;
   flex-wrap: wrap;
@@ -646,14 +769,13 @@ button.ghost:hover { border-color: var(--accent); color: var(--accent); }
 [data-theme="dark"] .wrap svg [fill="#1f2937"] { fill: #475569; }
 [data-theme="dark"] .wrap svg [fill="#31404d"] { fill: #4a5b6d; }
 
-/* simulator text uses SVG classes rather than fill attributes */
-[data-theme="dark"] .sim-axis { fill: #e6ebf2; }
-[data-theme="dark"] .sim-tick { fill: #9aa7b8; }
+/* simulator panel background (the bench is plain markup, not a drawn class) */
 [data-theme="dark"] .sim__bench { background: var(--surface-2); }
 
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .ring-head { animation: none; display: none; }
 }
 
 /* ---------- smooth anchor offset (sticky nav) ---------- */

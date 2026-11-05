@@ -197,18 +197,45 @@
       <span class="badge">interactive simulation</span>
     </div>
 
+    <div class="sim__bar" role="group" aria-label="Plot options">
+      <div class="seg" role="group" aria-label="Frequency axis">
+        <span class="seg__cap">Axis</span>
+        <button type="button" class="seg__b is-on" data-axis="zoom" aria-pressed="true">Zoom on f<sub>0</sub></button>
+        <button type="button" class="seg__b" data-axis="band" aria-pressed="false">Full MW band</button>
+      </div>
+      <div class="seg" role="group" aria-label="Vertical scale">
+        <span class="seg__cap">Scale</span>
+        <button type="button" class="seg__b is-on" data-unit="lin" aria-pressed="true">V / V<sub>pk</sub></button>
+        <button type="button" class="seg__b" data-unit="db" aria-pressed="false">dB</button>
+      </div>
+      <button type="button" class="chip" id="btnGhost" aria-pressed="false">Compare a good coil (Q 30)</button>
+      <div class="seg" role="group" aria-label="Auto tune">
+        <span class="seg__cap">Tune to</span>
+        <button type="button" class="seg__b" id="btn819">819 kHz</button>
+        <button type="button" class="seg__b" id="btn623">623 kHz</button>
+      </div>
+    </div>
+
     <div class="sim__controls">
       <label class="ctrl">
         <span class="ctrl__label">Inductance L <output id="valL">291.5 µH</output></span>
         <input type="range" id="inL" min="100" max="500" step="0.5" value="291.5">
+        <span class="ctrl__hint">Wheeler for our 75 turns gives 291.5 µH.</span>
       </label>
       <label class="ctrl">
         <span class="ctrl__label">Capacitance C <output id="valC">130 pF</output></span>
         <input type="range" id="inC" min="20" max="280" step="1" value="130">
+        <span class="ctrl__hint">The 20–280 pF variable capacitor on the bench.</span>
+      </label>
+      <label class="ctrl">
+        <span class="ctrl__label">Stray / probe C<sub>s</sub> <output id="valStray">0 pF</output></span>
+        <input type="range" id="inStray" min="0" max="150" step="1" value="0">
+        <span class="ctrl__hint">Adds to C. This is the extra capacitance that pulled our 819 kHz down to ~620.</span>
       </label>
       <label class="ctrl">
         <span class="ctrl__label">Quality factor Q <output id="valQ">6.9</output></span>
         <input type="range" id="inQ" min="1" max="300" step="0.1" value="6.9">
+        <span class="ctrl__hint">6.9 is what our sweep actually measured.</span>
       </label>
     </div>
 
@@ -342,9 +369,23 @@
            aria-label="Plot of the tank’s normalised response against frequency, with markers at the resonant frequency and at the two −3 dB points."></svg>
     </div>
 
+    <div class="sim__ring">
+      <p class="sim__sub">Time domain · what the tank does to a kick at TP1</p>
+      <svg id="simRing" viewBox="0 0 720 150" role="img"
+           aria-label="The tank’s ring-down: a damped sine at TP1 whose envelope falls by 1/e after Q divided by pi cycles."></svg>
+      <p class="sim__caption sim__caption--tight">
+        A poor tank rings for a cycle or two and dies; a good one keeps going. That count is exactly
+        <i>Q / π</i> — which is why Q is not just a number on the slider.
+      </p>
+    </div>
+
     <div class="sim__readout">
       <div class="stat stat--hero"><b>Resonant f<sub>0</sub></b><span id="out_f0">—</span></div>
       <div class="stat"><b>−3 dB bandwidth</b><span id="out_bw">—</span></div>
+      <div class="stat"><b>Δ vs 819 kHz</b><span id="out_delta">—</span></div>
+      <div class="stat"><b>Rejection at ±10 kHz</b><span id="out_rej">—</span></div>
+      <div class="stat"><b>MW channels in band</b><span id="out_ch">—</span></div>
+      <div class="stat"><b>Cycles to 1/e</b><span id="out_ring">—</span></div>
       <div class="stat"><b>f<sub>low</sub></b><span id="out_flow">—</span></div>
       <div class="stat"><b>f<sub>high</sub></b><span id="out_fhigh">—</span></div>
       <div class="stat"><b>C for 819 kHz</b><span id="out_c819">—</span></div>
@@ -354,6 +395,7 @@
 
     <div class="sim__foot">
       <p class="verdict" id="out_verdict">—</p>
+      <span class="sim__status" id="simStatus" role="status" aria-live="polite"></span>
       <button class="ghost" id="simReset" type="button">Reset to our values</button>
     </div>
   </div>
