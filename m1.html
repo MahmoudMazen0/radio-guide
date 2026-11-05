@@ -621,7 +621,7 @@
       <text x="398" y="74" text-anchor="middle" font-size="9.5" fill="#5b6675">fitted parallel-tank curve  H(f) = Vmax / √(1 + Q²(u − 1/u)²)  ·  f0 = 623.1 kHz · Q = 6.9 · residuals ≤ 26 mV</text>
     </svg>
     <figcaption>
-      Figure 1 — the seven-point sweep that built Table 5 (points), fitted with the parallel-tank
+      Figure 2 — the seven-point sweep that built Table 5 (points), fitted with the parallel-tank
       response (line). The −3 dB band is 578 to 668 kHz, so Q = 623 / 90 = 6.9. Table 5’s
       623 kHz is this fitted maximum, and the “Measured” row is these bench points — taken with the
       ×1 probe still on TP1, which is why the tank sits at 620-ish and not at 819 (probe ≈ 100 pF, §8.3).
@@ -631,7 +631,7 @@
   <figure>
     <img src="images/resonance.png" alt="Two scope screenshots side by side: on the left a small sine wave when the tank is away from resonance, on the right a much larger sine wave when the capacitor is tuned to f0. Both are at 1.00 V per division and 500 nanoseconds per division." loading="lazy">
     <figcaption>
-      Figure 2 — the same probe, the same 1.00 V/div and 500 ns/div, only the capacitor moved.
+      Figure 3 — the same probe, the same 1.00 V/div and 500 ns/div, only the capacitor moved.
       Left: away from resonance, about one division peak to peak. Right: tuned to f<sub>0</sub>,
       about three. Reading the period off the screen (≈ 3.3 divisions × 500 ns ≈ 1.65 µs) already
       says ≈ 600 kHz — close to the 620 we were looking for, and nowhere near the 819 of Table 4.
@@ -641,7 +641,7 @@
   <figure class="fig--narrow">
     <img src="images/tp1-scope.png" alt="Scope screenshot of TP1 at resonance on the RIGOL DS1052E, showing about four cycles of a sine wave with the scope’s measurement table open" loading="lazy">
     <figcaption>
-      Figure 3 — TP1 at f<sub>0</sub>, with the scope’s own measurement table open.
+      Figure 4 — TP1 at f<sub>0</sub>, with the scope’s own measurement table open.
       This is the trace the seven-point sweep in Table 5 is built on; the 0.7-of-peak points
       come from fitting that sweep, not from a single screen.
     </figcaption>
@@ -780,7 +780,7 @@
       <text x="40" y="368" font-size="12" fill="#5b6675">That is why the first rows of Table 6 read 0.0 mV while the later ones climb.</text>
     </svg>
     <figcaption>
-      Figure 4 — what the detector actually does. Left: the AM wave at TP1. Middle: its envelope.
+      Figure 6 — what the detector actually does. Left: the AM wave at TP1. Middle: its envelope.
       Right: TP3 after the 1N60P — a DC that follows the envelope, which for a steady sine is just a DC level.
       The amber line is the diode’s dead zone: below it, TP3 is silent no matter how good the resonance is.
     </figcaption>
@@ -1002,7 +1002,7 @@
       <circle cx="60" cy="355" r="16" fill="#16794a"/><text x="60" y="362" text-anchor="middle" fill="#fff" font-size="16" font-weight="bold">✓</text>
       <text x="90" y="360" font-size="15" font-weight="700" fill="#1a2029">Checkpoint 3: resonance at TP1 ✓ · DC at TP3 ✓ · Tables 5 &amp; 6 filled ✓</text>
     </svg>
-    <figcaption>Figure 6 — the M1 build as a checklist: every arrow is a place where the bench can surprise you.</figcaption>
+    <figcaption>Figure 7 — the M1 build as a checklist: every arrow is a place where the bench can surprise you.</figcaption>
   </figure>
 
   <h3>Troubleshooting — what to check when it does not work</h3>
